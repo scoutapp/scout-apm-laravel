@@ -17,14 +17,11 @@ class LogRequest
 
     public function handle($request, Closure $next)
     {
-        $routeController = str_replace($request->route()->action['namespace'].'\\', '', $request->route()->action['controller']);
-        $controllerName = 'Controller/'.$routeController;
-        $this->agent->startSpan($controllerName, 'Request', LARAVEL_START+0.000001);
-
         $response = $next($request);
 
-        $this->agent->stopSpan($controllerName, 'Request');
-        $this->agent->stopRequest('Request');
+        $agent = resolve(Agent::class);
+
+        $this->agent->stopSpan();
 
         return $response;
     }
