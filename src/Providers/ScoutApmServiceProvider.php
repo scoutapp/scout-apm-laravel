@@ -16,15 +16,13 @@ class ScoutApmServiceProvider extends ServiceProvider
         ], 'config');
 
         $agent = resolve(Agent::class);
-        $request = $agent->startRequest('Request', LARAVEL_START);
 
         if (!app()->runningInConsole()) {
-            DB::listen(function (QueryExecuted $query) use ($agent, $request) {
+            DB::listen(function (QueryExecuted $query) use ($agent) {
                 $startingTime = microtime(true) - ($query->time / 1000);
-                $requestSpan = $agent->getRequest('Request')->getFirstSpan();
-                $span = $agent->startSpan('SQL/Query', 'Request', $startingTime, $requestSpan->getName());
-                $agent->tagSpan('Request', 'db.statement', $query->sql, $request->getId(), $span->getId(), $startingTime+0.000001);
-                $agent->stopSpan('SQL/Query', 'Request');
+                $agent->startSpan('SQL/Query', $startingTime);
+                $agent->tagSpan('Request', 'db.statement', $query->sql, $startingTime+0.000001);
+                $agent->stopSpan();
             });
         }
 
