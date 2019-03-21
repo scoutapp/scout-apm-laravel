@@ -40,6 +40,8 @@ class ScoutApmServiceProvider extends ServiceProvider
             'scoutapm'
         );
 
+        $this->app->register(EventServiceProvider::class);
+
         $this->app->singleton(Agent::class, function ($app) {
             return new Agent(
                 [
