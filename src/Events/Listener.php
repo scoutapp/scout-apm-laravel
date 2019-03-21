@@ -2,6 +2,7 @@
 
 namespace Scoutapm\Laravel\Events;
 
+use Illuminate\Routing\Events\RouteMatched;
 use Scoutapm\Agent;
 
 class Listener {
@@ -27,6 +28,20 @@ class Listener {
      */
     public function handle($event, $data)
     {
+        $routeMatchedString = RouteMatched::class;
+        if (substr($event, 0, strlen($routeMatchedString)) === $routeMatchedString) {
+            $routeMatched = reset($data);
+            $route = $routeMatched->route;
+
+            $name = 'Controller/' . $route->uri;
+            if (isset($route->action['controller'])) {
+                $name = 'Controller/' . $route->action['controller'];
+            }
+
+            $this->agent->startSpan($name, LARAVEL_START);
+
+        }
+
         $creatingString = 'creating: ';
         if (substr($event, 0, strlen($creatingString)) === $creatingString) {
             $view = reset($data);
