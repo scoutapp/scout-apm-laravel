@@ -17,14 +17,12 @@ class ScoutApmServiceProvider extends ServiceProvider
 
         $agent = resolve(Agent::class);
 
-        if (!app()->runningInConsole()) {
-            DB::listen(function (QueryExecuted $query) use ($agent) {
-                $startingTime = microtime(true) - ($query->time / 1000);
-                $agent->startSpan('SQL/Query', $startingTime);
-                $agent->tagSpan('Request', 'db.statement', $query->sql, $startingTime+0.000001);
-                $agent->stopSpan();
-            });
-        }
+        DB::listen(function (QueryExecuted $query) use ($agent) {
+            $startingTime = microtime(true) - ($query->time / 1000);
+            $agent->startSpan('SQL/Query', $startingTime);
+            $agent->tagSpan('Request', 'db.statement', $query->sql, $startingTime+0.000001);
+            $agent->stopSpan();
+        });
 
         // Automatically register middleware
         // $router = $this->app['router'];
