@@ -39,7 +39,6 @@ class Listener {
             }
 
             $this->agent->startSpan($name, LARAVEL_START);
-
         }
 
         $creatingString = 'creating: ';
