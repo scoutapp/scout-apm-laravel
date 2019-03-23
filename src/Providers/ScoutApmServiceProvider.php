@@ -4,13 +4,19 @@ namespace Scoutapm\Laravel\Providers;
 
 use Illuminate\Database\Events\QueryExecuted;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
 use Scoutapm\Agent;
+use Scoutapm\Laravel\Events\ViewComposer;
+use Scoutapm\Laravel\Events\ViewCreator;
 
 class ScoutApmServiceProvider extends ServiceProvider
 {
     public function boot()
     {
+        View::composer('*', ViewComposer::class);
+        View::creator('*', ViewCreator::class);
+
         $this->publishes([
             __DIR__ . '/../../config/scoutapm.php' => config_path('scoutapm.php'),
         ], 'config');
