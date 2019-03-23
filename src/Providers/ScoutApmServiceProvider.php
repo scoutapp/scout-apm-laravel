@@ -26,7 +26,7 @@ class ScoutApmServiceProvider extends ServiceProvider
         DB::listen(function (QueryExecuted $query) use ($agent) {
             $startingTime = microtime(true) - ($query->time / 1000);
             $agent->startSpan('SQL/Query', $startingTime);
-            $agent->tagSpan('Request', 'db.statement', $query->sql, $startingTime+0.000001);
+            $agent->tagSpan('db.statement', $query->sql, $startingTime+0.000001);
             $agent->stopSpan();
         });
 
