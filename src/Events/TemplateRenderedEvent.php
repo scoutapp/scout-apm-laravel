@@ -27,7 +27,8 @@ class TemplateRenderedEvent {
      */
     public function handle($event, $data)
     {
-        $this->agent->startSpan('Template/Render'); // Start when View is Composing
+        $view = reset($data);
+        $this->agent->startSpan('Template/Render/' . $view->getName()); // Start when View is Composing
     }
 
 }

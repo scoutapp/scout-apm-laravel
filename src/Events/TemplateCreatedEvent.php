@@ -27,7 +27,8 @@ class TemplateCreatedEvent {
      */
     public function handle($event, $data)
     {
-        $this->agent->startSpan('Template/Compile'); // Start when View is Creating
+        $view = reset($data);
+        $this->agent->startSpan('Template/Compile/' . $view->getName()); // Start when View is Creating
     }
 
 }
