@@ -30,7 +30,7 @@ class ViewComposer
      */
     public function compose(View $view)
     {
-        $this->agent->tagSpan("Template/Render", $view->getName(), microtime(true));
+        // $this->agent->tagSpan("Template/Render", $view->getName(), microtime(true));
         $this->agent->stopSpan(); // Stop after View is Composed
     }
 }
