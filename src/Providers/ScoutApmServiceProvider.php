@@ -54,6 +54,7 @@ class ScoutApmServiceProvider extends ServiceProvider
                 ]
             );
         });
+
         $this->app->alias(Agent::class, 'scoutapm');
     }
 }
