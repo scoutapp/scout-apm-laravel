@@ -19,8 +19,6 @@ class LogRequest
     {
         $response = $next($request);
 
-        $agent = resolve(Agent::class);
-
         $this->agent->stopSpan();
 
         return $response;
