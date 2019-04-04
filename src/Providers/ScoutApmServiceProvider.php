@@ -14,7 +14,7 @@ use Scoutapm\Laravel\Middleware\LogRequest;
 
 class ScoutApmServiceProvider extends ServiceProvider
 {
-    public function boot(Kernel $kernel)
+    public function boot(Kernel $kernel, Agent $agent)
     {
         View::composer('*', ViewComposer::class);
         View::creator('*', ViewCreator::class);
@@ -22,8 +22,6 @@ class ScoutApmServiceProvider extends ServiceProvider
         $this->publishes([
             __DIR__ . '/../../config/scoutapm.php' => config_path('scoutapm.php'),
         ], 'config');
-
-        $agent = resolve(Agent::class);
 
         DB::listen(function (QueryExecuted $query) use ($agent) {
             $startingTime = microtime(true) - ($query->time / 1000);
