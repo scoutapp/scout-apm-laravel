@@ -2,6 +2,7 @@
 
 namespace Scoutapm\Laravel\Providers;
 
+use Illuminate\Contracts\Http\Kernel;
 use Illuminate\Database\Events\QueryExecuted;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\View;
@@ -9,10 +10,11 @@ use Illuminate\Support\ServiceProvider;
 use Scoutapm\Agent;
 use Scoutapm\Laravel\Events\ViewComposer;
 use Scoutapm\Laravel\Events\ViewCreator;
+use Scoutapm\Laravel\Middleware\LogRequest;
 
 class ScoutApmServiceProvider extends ServiceProvider
 {
-    public function boot()
+    public function boot(Kernel $kernel)
     {
         View::composer('*', ViewComposer::class);
         View::creator('*', ViewCreator::class);
@@ -30,9 +32,7 @@ class ScoutApmServiceProvider extends ServiceProvider
             $agent->stopSpan();
         });
 
-        // Automatically register middleware
-        // $router = $this->app['router'];
-        // $router->pushMiddlewareToGroup('web', ScoutApm\Middleware\LogRequest::class);
+        $kernel->pushMiddleware(LogRequest::class);
     }
 
     public function register()
