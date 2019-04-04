@@ -4,7 +4,6 @@ namespace Scoutapm\Laravel\Providers;
 
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
 use Illuminate\Routing\Events\RouteMatched;
-use Scoutapm\Laravel\Events\Listener;
 use Scoutapm\Laravel\Events\RouteMatchedEvent;
 use Scoutapm\Laravel\Events\TemplateCreatedEvent;
 use Scoutapm\Laravel\Events\TemplateRenderedEvent;
