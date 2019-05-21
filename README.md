@@ -12,7 +12,7 @@ A Scout account is required. [Signup for Scout](https://apm.scoutapp.com/users/s
 
     composer require scoutapp/scoutapm-laravel
     
-### Api Key
+### API Key
 
 In your `.env` file, make sure you set your Scout API key:
 
@@ -28,6 +28,7 @@ You must enable our custom middleware in your `app/Http/Kernel.php`:
 
 For full installation and troubleshooting documentation, visit our
 [help site](http://help.apm.scoutapp.com/#laravel-agent).
+
 
 ## Support
 
