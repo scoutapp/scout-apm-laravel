@@ -1,38 +1,39 @@
 {  
-   "name" : "scoutapp/scoutapm-laravel",
-   "description":"A Laravel agent for Scout",
-   "require":{  
-      "php":">= 7.0",
-      "illuminate/http":"5.5.x|5.6.x|5.7.x|5.8.x",
-      "illuminate/routing":"5.5.x|5.6.x|5.7.x|5.8.x",
-      "illuminate/support":"5.5.x|5.6.x|5.7.x|5.8.x",
-      "scoutapp/scoutapm-php":"@dev",
-      "ramsey/uuid":"^3.0"
-   },
-   "require-dev":{  
-      "phpunit/phpunit":"6.*"
-   },
-   "autoload":{  
-      "psr-4":{  
-         "Scoutapm\\Laravel\\":"src/"
-      }
-   },
-   "autoload-dev":{  
-      "psr-4":{  
-         "Scoutapm\\Tests\\":"tests/"
-      }
-   },
-   "extra":{  
-      "laravel":{  
-         "providers":[  
-            "Scoutapm\\Laravel\\Providers\\ScoutApmServiceProvider"
-         ],
-         "aliases":{  
-            "ScoutApm":"Scoutapm\\Laravel\\Facades\\ScoutApm"
-         }
-      }
-   },
-   "config":{  
-      "optimize-autoloader":true
-   }
+    "name" : "scoutapp/scoutapm-laravel",
+    "description":"A Laravel agent for Scout",
+    "require":{  
+        "php":">= 7.0",
+        "illuminate/http":"5.5.x|5.6.x|5.7.x|5.8.x",
+        "illuminate/routing":"5.5.x|5.6.x|5.7.x|5.8.x",
+        "illuminate/support":"5.5.x|5.6.x|5.7.x|5.8.x",
+        "scoutapp/scoutapm-php":"@dev",
+        "ramsey/uuid":"^3.0"
+    },
+    "require-dev" : {
+        "phpunit/phpunit" : "6.*",
+        "spatie/phpunit-watcher": "^1.8"
+    },
+    "autoload":{  
+        "psr-4":{  
+            "Scoutapm\\Laravel\\":"src/"
+        }
+    },
+    "autoload-dev":{  
+        "psr-4":{  
+            "Scoutapm\\Tests\\":"tests/"
+        }
+    },
+    "extra":{  
+        "laravel":{  
+            "providers":[  
+                "Scoutapm\\Laravel\\Providers\\ScoutApmServiceProvider"
+            ],
+            "aliases":{  
+                "ScoutApm":"Scoutapm\\Laravel\\Facades\\ScoutApm"
+            }
+        }
+    },
+    "config":{  
+        "optimize-autoloader":true
+    }
 }
