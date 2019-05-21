@@ -45,10 +45,10 @@ class ScoutApmServiceProvider extends ServiceProvider
         $this->app->singleton(Agent::class, function ($app) {
             return new Agent(
                 [
-                    'active' => config('scoutapm.active'),
-                    'appName' => config('scoutapm.appName'),
-                    'socketLocation' => config('scoutapm.socketLocation'),
+                    'monitor' => config('scoutapm.monitor'),
+                    'name' => config('scoutapm.name'),
                     'key' => config('scoutapm.key'),
+                    'socketLocation' => config('scoutapm.socketLocation'),
                 ]
             );
         });
