@@ -16,6 +16,7 @@ class TemplateCreatedEvent {
     public function __construct(Agent $agent)
     {
         $this->agent = $agent;
+        $this->agent->getLogger()->info('installed templatecreatedevent');
     }
 
     /**
@@ -28,7 +29,8 @@ class TemplateCreatedEvent {
     public function handle($event, $data)
     {
         $view = reset($data);
-        $this->agent->startSpan('Template/Compile/' . $view->getName()); // Start when View is Creating
+        // $this->agent->startSpan('Template/Compile/' . $view->getName()); // Start when View is Creating
+        $this->agent->getLogger()->info('Template/Compile/' . microtime());
     }
 
 }

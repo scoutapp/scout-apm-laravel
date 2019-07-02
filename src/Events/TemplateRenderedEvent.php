@@ -16,6 +16,7 @@ class TemplateRenderedEvent {
     public function __construct(Agent $agent)
     {
         $this->agent = $agent;
+        $this->agent->getLogger()->info('installed templaterenderedevent');
     }
 
     /**
@@ -28,7 +29,8 @@ class TemplateRenderedEvent {
     public function handle($event, $data)
     {
         $view = reset($data);
-        $this->agent->startSpan('Template/Render/' . $view->getName()); // Start when View is Composing
+        // $this->agent->startSpan('Template/Render/' . $view->getName()); // Start when View is Composing
+        $this->agent->getLogger()->info('Template/Render/' . microtime());
     }
 
 }

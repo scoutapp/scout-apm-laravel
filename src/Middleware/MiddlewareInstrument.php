@@ -6,31 +6,25 @@ use Closure;
 use Illuminate\Support\Facades\Log;
 use Scoutapm\Agent;
 
-class LogRequest
+class MiddlewareInstrument
 {
     protected $agent;
 
     public function __construct(Agent $agent)
     {
         $this->agent = $agent;
+        $this->agent->getLogger()->info("Installing MiddlwareInstrument");
     }
 
     public function handle($request, Closure $next)
     {
+        $this->agent->getLogger()->info("Handle MiddlewareInstrument");
+        $this->agent->startSpan("Middleware/all");
+
         $response = $next($request);
 
         $this->agent->stopSpan();
 
         return $response;
-    }
-
-    public function terminate($request, $response)
-    {
-        try {
-            $this->agent->send();
-        }
-        catch(\Throwable $t) {
-            Log::error($t);
-        }
     }
 }

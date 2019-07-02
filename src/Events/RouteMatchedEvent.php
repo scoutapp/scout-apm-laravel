@@ -36,5 +36,4 @@ class RouteMatchedEvent {
 
         $this->agent->startSpan($name, LARAVEL_START);
     }
-
 }
