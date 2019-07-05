@@ -19,13 +19,11 @@ class ActionInstrument
 
     public function handle($request, Closure $next)
     {
-        $this->agent->getLogger()->info("Handle ActionInstrument");
         $span = $this->agent->startSpan("Controller/unknown");
 
         $response = $next($request);
 
         $span->updateName($this->getName());
-
         $this->agent->stopSpan();
 
         return $response;
@@ -34,19 +32,19 @@ class ActionInstrument
     // Get the name of the controller span from the controller name if
     // possible, but fall back on the uri if no controller was found.
     public function getName() {
+        $name = 'unknown';
         try {
             $route = Route::current();
-            if ($route == null) {
-                return 'Controller/unknown';
+            if ($route != null) {
+                $name = $route->uri();
+                if (isset($route->action['controller'])) {
+                    $name =  $route->action['controller'];
+                }
             }
-
-            $name = $route->uri();
-            if (isset($route->action['controller'])) {
-                $name =  $route->action['controller'];
-            }
-            return 'Controller/' . $name;
         } catch (\Exception $e) { 
-            return 'Controller/unknown';
+            $this->agent->getLogger()->warn("Exception obtaining name of endpoint: getName()");
         }
+
+        return 'Controller/'.$name;
     }
 }

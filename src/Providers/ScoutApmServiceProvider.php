@@ -24,12 +24,8 @@ class ScoutApmServiceProvider extends ServiceProvider
 {
     public function register()
     {
-        $this->mergeConfigFrom(
-            __DIR__ . '/../../config/scoutapm.php',
-            'scoutapm'
-        );
-
-        $this->app->register(EventServiceProvider::class);
+        // No events currently mapped. May be needed in the future.
+        // $this->app->register(EventServiceProvider::class);
 
         $this->app->singleton(Agent::class, function ($app) {
             return new Agent();
@@ -42,20 +38,16 @@ class ScoutApmServiceProvider extends ServiceProvider
     {
         $agent->setLogger($log);
 
-        // Allow the user to copy a default configuration file over to their
-        // Laravel app's config directory. See-also our configuration
-        // documentation for other approaches to Scout Agent configuration.
-        $this->publishes([
-            __DIR__ . '/../../config/scoutapm.php' => config_path('scoutapm.php'),
-        ], 'config');
+        $this->installInstruments();
+    }
 
-        //////////////
-        // This installs all the instruments right here. If/when the laravel
-        // specific instruments grow, we should extract them to other more
-        // reasonable places.
-
-        View::composer('*', ViewComposer::class);
-        View::creator('*', ViewCreator::class);
+    //////////////
+    // This installs all the instruments right here. If/when the laravel
+    // specific instruments grow, we should extract them to a dedicated
+    // instrument manager as we add more.
+    public function installInstruments() {
+        // View::composer('*', ViewComposer::class);
+        // View::creator('*', ViewCreator::class);
 
         DB::listen(function (QueryExecuted $query) use ($agent) {
             $startingTime = microtime(true) - ($query->time / 1000);
