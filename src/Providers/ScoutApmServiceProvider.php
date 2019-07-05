@@ -11,6 +11,7 @@ use Illuminate\Support\ServiceProvider;
 use Scoutapm\Agent;
 use Psr\Log\LoggerInterface;
 
+use Scoutapm\Laravel\Commands\DownloadCoreAgent;
 use Scoutapm\Laravel\Events\ViewComposer;
 use Scoutapm\Laravel\Events\ViewCreator;
 use Scoutapm\Laravel\Providers\EventServiceProvider;
@@ -38,14 +39,19 @@ class ScoutApmServiceProvider extends ServiceProvider
     {
         $agent->setLogger($log);
 
-        $this->installInstruments();
+        $this->installInstruments($kernel, $agent);
+
+        if ($this->app->runningInConsole()) {
+            $this->commands([DownloadCoreAgent::class]);
+        }
+
     }
 
     //////////////
     // This installs all the instruments right here. If/when the laravel
     // specific instruments grow, we should extract them to a dedicated
     // instrument manager as we add more.
-    public function installInstruments() {
+    public function installInstruments(Kernel $kernel, Agent $agent) {
         // View::composer('*', ViewComposer::class);
         // View::creator('*', ViewCreator::class);
 
