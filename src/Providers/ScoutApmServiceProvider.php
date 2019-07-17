@@ -39,6 +39,8 @@ class ScoutApmServiceProvider extends ServiceProvider
     {
         $agent->setLogger($log);
 
+        $agent->connect();
+
         $this->installInstruments($kernel, $agent);
 
         if ($this->app->runningInConsole()) {
