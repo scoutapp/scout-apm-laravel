@@ -14,11 +14,12 @@ class ActionInstrument
     public function __construct(Agent $agent)
     {
         $this->agent = $agent;
-        $this->agent->getLogger()->info("Installing ActionInstrument");
     }
 
     public function handle($request, Closure $next)
     {
+        $this->agent->getLogger()->debug("[Scout] Handle ActionInstrument");
+
         $span = $this->agent->startSpan("Controller/unknown");
 
         $response = $next($request);
@@ -42,7 +43,7 @@ class ActionInstrument
                 }
             }
         } catch (\Exception $e) { 
-            $this->agent->getLogger()->warn("Exception obtaining name of endpoint: getName()");
+            $this->agent->getLogger()->debug("[Scout] Exception obtaining name of endpoint: getName()");
         }
 
         return 'Controller/'.$name;

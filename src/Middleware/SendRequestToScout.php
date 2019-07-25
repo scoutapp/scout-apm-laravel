@@ -19,15 +19,18 @@ class SendRequestToScout
     public function handle($request, Closure $next)
     {
         $response = $next($request);
+
+        try {
+            $this->agent->send();
+            $this->agent->getLogger()->debug("[Scout] SendRequestToScout succeeded");
+        } catch (\Exception $e) {
+            $this->agent->getLogger()->debug("[Scout] SendRequestToScout failed: " . $e);
+        }
+
         return $response;
     }
 
     public function terminate($request, $response)
     {
-        try {
-            $this->agent->send();
-        } catch (\Exception $e) {
-            $this->agent->getLogger()->info("SendRequestToScout failed: ");
-        }
     }
 }

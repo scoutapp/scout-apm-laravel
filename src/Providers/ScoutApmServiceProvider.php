@@ -41,6 +41,8 @@ class ScoutApmServiceProvider extends ServiceProvider
 
         $agent->connect();
 
+        $agent->getLogger()->debug("[Scout] Agent is starting");
+
         $this->installInstruments($kernel, $agent);
 
         if ($this->app->runningInConsole()) {
