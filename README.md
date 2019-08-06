@@ -12,17 +12,15 @@ A Scout account is required. [Signup for Scout](https://apm.scoutapp.com/users/s
 
     composer require scoutapp/scoutapm-laravel
     
-### API Key
+### Configuration
 
-In your `.env` file, make sure you set your Scout API key:
+In your `.env` file, make sure you set a few configuration variables:
 
     SCOUT_KEY=ABC0ZABCDEFGHIJKLMNOP
+    SCOUT_NAME="My Laravel App"
+    SCOUT_MONITOR=true
     
-### Middleware
-
-You must enable our custom middleware in your `app/Http/Kernel.php`:
-
-    \Scoutapm\Laravel\Middleware\LogRequest::class
+Your key can be found in the Scout Org settings page.
     
 ## Documentation
 
@@ -33,3 +31,28 @@ For full installation and troubleshooting documentation, visit our
 ## Support
 
 Please contact us at support@scoutapp.com or create an issue in this repo.
+
+## Custom Instrumentation
+
+```
+$request = new ServiceRequest();
+$request->setApiVersion($version);
+```
+
+Turns into:
+
+```
+// At top, with other imports
+use ScoutApm;
+
+// Replacing the above code
+$request = ScoutApm::instrument(
+    "Custom", "Building Service Request",
+    function ($span) use ($version) {
+        $request = new ServiceRequest();
+        $request->setApiVersion($version);
+        return $request;
+    }
+);
+```
+
