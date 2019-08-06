@@ -1,6 +1,11 @@
 {  
     "name" : "scoutapp/scoutapm-laravel",
-    "description":"A Laravel agent for Scout",
+    "description": "Scout Application Performance Monitoring Agent - https://scoutapm.com",
+
+    "homepage": "https://scoutapm.com/",
+    "license": "MIT",
+    "keywords": ["laravel", "performance", "apm", "monitoring", "development"],
+
     "require":{  
         "php":">= 7.0",
         "illuminate/http":"5.5.x|5.6.x|5.7.x|5.8.x",
