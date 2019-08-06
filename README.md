@@ -8,7 +8,7 @@ Detailed performance metrics and transaction traces are collected once the scout
 * Laravel Version: 5.5+
 
 ## Quick Start
-A Scout account is required. [Signup for Scout](https://apm.scoutapp.com/users/sign_up).
+A Scout account is required. [Signup for Scout](https://apm.scoutapm.com/users/sign_up).
 
     composer require scoutapp/scoutapm-laravel
     
@@ -25,12 +25,12 @@ Your key can be found in the Scout Org settings page.
 ## Documentation
 
 For full installation and troubleshooting documentation, visit our
-[help site](http://help.apm.scoutapp.com/#laravel-agent).
+[help site](http://help.apm.scoutapm.com/#laravel-agent).
 
 
 ## Support
 
-Please contact us at support@scoutapp.com or create an issue in this repo.
+Please contact us at support@scoutapm.com or create an issue in this repo.
 
 ## Custom Instrumentation
 
