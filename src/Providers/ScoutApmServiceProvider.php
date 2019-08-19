@@ -18,7 +18,7 @@ use Scoutapm\Laravel\Providers\EventServiceProvider;
 use Scoutapm\Laravel\Middleware\ActionInstrument;
 use Scoutapm\Laravel\Middleware\MiddlewareInstrument;
 use Scoutapm\Laravel\Middleware\SendRequestToScout;
-
+use Scoutapm\Laravel\Middleware\IgnoredEndpoints;
 
 
 class ScoutApmServiceProvider extends ServiceProvider
@@ -76,6 +76,7 @@ class ScoutApmServiceProvider extends ServiceProvider
         // instruments. When this middleware's
         // terminate is called, it will complete the
         // request, and send it to the CoreAgent.
+        $kernel->prependMiddleware(IgnoredEndpoints::class);
         $kernel->prependMiddleware(SendRequestToScout::class);
     }
 }
