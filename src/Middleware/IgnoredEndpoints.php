@@ -20,10 +20,10 @@ class IgnoredEndpoints
     {
         // Check if the request path we're handling is configured to be
         // ignored, and if so, mark it as such.
-        if ($this->agent->ignored($request->path()))
+        if ($this->agent->ignored("/".$request->path()))
         {
-            $this->$agent->getLogger()->info("Marking request to ".$request->path()." as ignored");
-            $this->$agent->ignore();
+            // $this->agent->getLogger()->debug("Marking request to /".$request->path()." as ignored");
+            $this->agent->ignore();
         }
 
         return $next($request);
