@@ -11,10 +11,8 @@ use Illuminate\Support\ServiceProvider;
 use Scoutapm\Agent;
 use Psr\Log\LoggerInterface;
 
+use Scoutapm\Config;
 use Scoutapm\Laravel\Commands\DownloadCoreAgent;
-use Scoutapm\Laravel\Events\ViewComposer;
-use Scoutapm\Laravel\Events\ViewCreator;
-use Scoutapm\Laravel\Providers\EventServiceProvider;
 use Scoutapm\Laravel\Middleware\ActionInstrument;
 use Scoutapm\Laravel\Middleware\MiddlewareInstrument;
 use Scoutapm\Laravel\Middleware\SendRequestToScout;
@@ -29,7 +27,7 @@ class ScoutApmServiceProvider extends ServiceProvider
         // $this->app->register(EventServiceProvider::class);
 
         $this->app->singleton(Agent::class, function ($app) {
-            return new Agent();
+            return Agent::fromConfig(new Config());
         });
 
         $this->app->alias(Agent::class, 'scoutapm');
