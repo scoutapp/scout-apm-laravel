@@ -2,19 +2,17 @@
 
 namespace Scoutapm\Laravel\Providers;
 
+#use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\Http\Kernel;
 use Illuminate\Database\Events\QueryExecuted;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
 
 use Scoutapm\Agent;
 use Psr\Log\LoggerInterface;
 
+use Scoutapm\Config;
 use Scoutapm\Laravel\Commands\DownloadCoreAgent;
-use Scoutapm\Laravel\Events\ViewComposer;
-use Scoutapm\Laravel\Events\ViewCreator;
-use Scoutapm\Laravel\Providers\EventServiceProvider;
 use Scoutapm\Laravel\Middleware\ActionInstrument;
 use Scoutapm\Laravel\Middleware\MiddlewareInstrument;
 use Scoutapm\Laravel\Middleware\SendRequestToScout;
@@ -29,7 +27,10 @@ class ScoutApmServiceProvider extends ServiceProvider
         // $this->app->register(EventServiceProvider::class);
 
         $this->app->singleton(Agent::class, function ($app) {
-            return new Agent();
+            return Agent::fromConfig(
+                new Config(),
+                $this->app->make('log')
+            );
         });
 
         $this->app->alias(Agent::class, 'scoutapm');
@@ -37,11 +38,9 @@ class ScoutApmServiceProvider extends ServiceProvider
 
     public function boot(Kernel $kernel, Agent $agent, LoggerInterface $log)
     {
-        $agent->setLogger($log);
-
         $agent->connect();
 
-        $agent->getLogger()->debug("[Scout] Agent is starting");
+        $log->debug("[Scout] Agent is starting");
 
         $this->installInstruments($kernel, $agent);
 
