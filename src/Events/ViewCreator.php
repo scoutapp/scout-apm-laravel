@@ -3,6 +3,7 @@
 namespace Scoutapm\Laravel\Events;
 
 use Illuminate\View\View;
+use Illuminate\Support\Facades\Log;
 use Scoutapm\Agent;
 
 class ViewCreator
@@ -32,6 +33,6 @@ class ViewCreator
     {
         // $this->agent->tagSpan("Template/Compile", $view->getName(), microtime(true));
         // $this->agent->stopSpan(); // Stop after View is Created
-        $this->agent->getLogger()->info("ViewCreator: ".microtime());
+        Log::info("ViewCreator: ".microtime());
     }
 }

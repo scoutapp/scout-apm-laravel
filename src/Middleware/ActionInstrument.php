@@ -5,6 +5,7 @@ namespace Scoutapm\Laravel\Middleware;
 use Scoutapm\Agent;
 
 use Closure;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Route;
 
 class ActionInstrument
@@ -18,7 +19,7 @@ class ActionInstrument
 
     public function handle($request, Closure $next)
     {
-        $this->agent->getLogger()->debug("[Scout] Handle ActionInstrument");
+        Log::debug("[Scout] Handle ActionInstrument");
 
         $span = $this->agent->startSpan("Controller/unknown");
 
@@ -43,7 +44,7 @@ class ActionInstrument
                 }
             }
         } catch (\Exception $e) { 
-            $this->agent->getLogger()->debug("[Scout] Exception obtaining name of endpoint: getName()");
+            Log::debug("[Scout] Exception obtaining name of endpoint: getName()");
         }
 
         return 'Controller/'.$name;

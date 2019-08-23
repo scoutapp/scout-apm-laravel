@@ -17,7 +17,7 @@ class MiddlewareInstrument
 
     public function handle($request, Closure $next)
     {
-        $this->agent->getLogger()->debug("[Scout] Handle MiddlewareInstrument");
+        Log::debug("[Scout] Handle MiddlewareInstrument");
         $this->agent->startSpan("Middleware/all");
 
         $response = $next($request);

@@ -4,6 +4,8 @@ namespace Scoutapm\Laravel\Events;
 
 use Scoutapm\Agent;
 
+use Illuminate\Support\Facades\Log;
+
 class TemplateRenderedEvent {
 
     private $agent;
@@ -16,7 +18,7 @@ class TemplateRenderedEvent {
     public function __construct(Agent $agent)
     {
         $this->agent = $agent;
-        $this->agent->getLogger()->info('installed templaterenderedevent');
+        Log::info('installed templaterenderedevent');
     }
 
     /**
@@ -30,7 +32,7 @@ class TemplateRenderedEvent {
     {
         $view = reset($data);
         // $this->agent->startSpan('Template/Render/' . $view->getName()); // Start when View is Composing
-        $this->agent->getLogger()->info('Template/Render/' . microtime());
+        Log::info('Template/Render/' . microtime());
     }
 
 }

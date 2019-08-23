@@ -3,6 +3,7 @@
 namespace Scoutapm\Laravel\Events;
 
 use Illuminate\View\View;
+use Illuminate\Support\Facades\Log;
 use Scoutapm\Agent;
 
 class ViewComposer
@@ -32,6 +33,6 @@ class ViewComposer
     {
         // $this->agent->tagSpan("Template/Render", $view->getName(), microtime(true));
         // $this->agent->stopSpan(); // Stop after View is Composed
-        $this->agent->getLogger()->info("ViewComposer: ".microtime());
+        Log::info("ViewComposer: ".microtime());
     }
 }

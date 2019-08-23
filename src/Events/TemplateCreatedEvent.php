@@ -4,6 +4,8 @@ namespace Scoutapm\Laravel\Events;
 
 use Scoutapm\Agent;
 
+use Illuminate\Support\Facades\Log;
+
 class TemplateCreatedEvent {
 
     private $agent;
@@ -16,7 +18,7 @@ class TemplateCreatedEvent {
     public function __construct(Agent $agent)
     {
         $this->agent = $agent;
-        $this->agent->getLogger()->info('installed templatecreatedevent');
+        Log::info('installed templatecreatedevent');
     }
 
     /**
@@ -30,7 +32,7 @@ class TemplateCreatedEvent {
     {
         $view = reset($data);
         // $this->agent->startSpan('Template/Compile/' . $view->getName()); // Start when View is Creating
-        $this->agent->getLogger()->info('Template/Compile/' . microtime());
+        Log::info('Template/Compile/' . microtime());
     }
 
 }
