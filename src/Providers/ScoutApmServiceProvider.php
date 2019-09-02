@@ -2,17 +2,19 @@
 
 namespace Scoutapm\Laravel\Providers;
 
-#use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\Http\Kernel;
+use Illuminate\Contracts\View\Engine;
 use Illuminate\Database\Events\QueryExecuted;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\ServiceProvider;
 
+use Illuminate\View\Engines\EngineResolver;
 use Scoutapm\Agent;
 use Psr\Log\LoggerInterface;
 
 use Scoutapm\Config;
 use Scoutapm\Laravel\Commands\DownloadCoreAgent;
+use Scoutapm\Laravel\Events\ScoutViewEngineDecorator;
 use Scoutapm\Laravel\Middleware\ActionInstrument;
 use Scoutapm\Laravel\Middleware\MiddlewareInstrument;
 use Scoutapm\Laravel\Middleware\SendRequestToScout;
@@ -34,6 +36,21 @@ class ScoutApmServiceProvider extends ServiceProvider
         });
 
         $this->app->alias(Agent::class, 'scoutapm');
+
+        /** @var EngineResolver $viewResolver */
+        $viewResolver = $this->app->make('view.engine.resolver');
+
+        foreach (['file', 'php', 'blade'] as $engineName) {
+            $realEngine = $viewResolver->resolve($engineName);
+            $viewResolver->register($engineName, function () use ($realEngine) {
+                return $this->wrapEngine($realEngine);
+            });
+        }
+    }
+
+    public function wrapEngine(Engine $realEngine) : Engine
+    {
+        return new ScoutViewEngineDecorator($realEngine, $this->app->make('scoutapm'));
     }
 
     public function boot(Kernel $kernel, Agent $agent, LoggerInterface $log)

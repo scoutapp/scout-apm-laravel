@@ -1,44 +1,52 @@
-{  
-    "name" : "scoutapp/scout-apm-laravel",
+{
+    "name": "scoutapp/scout-apm-laravel",
     "description": "Scout Application Performance Monitoring Agent - https://scoutapm.com",
-
     "homepage": "https://scoutapm.com/",
     "license": "MIT",
-    "keywords": ["laravel", "performance", "apm", "monitoring", "development"],
-
-    "require":{  
-        "php":">= 7.0",
-        "illuminate/http":"5.5.x|5.6.x|5.7.x|5.8.x",
-        "illuminate/routing":"5.5.x|5.6.x|5.7.x|5.8.x",
-        "illuminate/support":"5.5.x|5.6.x|5.7.x|5.8.x",
-        "scoutapp/scout-apm-php":"0.1.1",
-        "ramsey/uuid":"^3.0"
+    "keywords": [
+        "laravel",
+        "performance",
+        "apm",
+        "monitoring",
+        "development"
+    ],
+    "require": {
+        "php": ">= 7.0",
+        "illuminate/contracts": "5.5.x|5.6.x|5.7.x|5.8.x",
+        "illuminate/http": "5.5.x|5.6.x|5.7.x|5.8.x",
+        "illuminate/routing": "5.5.x|5.6.x|5.7.x|5.8.x",
+        "illuminate/support": "5.5.x|5.6.x|5.7.x|5.8.x",
+        "illuminate/view": "5.5.x|5.6.x|5.7.x|5.8.x",
+        "psr/log": "^1.1",
+        "ramsey/uuid": "^3.0",
+        "scoutapp/scout-apm-php": "0.1.1"
     },
-    "require-dev" : {
-        "phpunit/phpunit" : "6.*",
+    "require-dev": {
+        "phpunit/phpunit": "6.*",
         "spatie/phpunit-watcher": "^1.8"
     },
-    "autoload":{  
-        "psr-4":{  
-            "Scoutapm\\Laravel\\":"src/"
+    "autoload": {
+        "psr-4": {
+            "Scoutapm\\Laravel\\": "src/"
         }
     },
-    "autoload-dev":{  
-        "psr-4":{  
-            "Scoutapm\\Tests\\":"tests/"
+    "autoload-dev": {
+        "psr-4": {
+            "Scoutapm\\Tests\\": "tests/"
         }
     },
-    "extra":{  
-        "laravel":{  
-            "providers":[  
+    "extra": {
+        "laravel": {
+            "providers": [
                 "Scoutapm\\Laravel\\Providers\\ScoutApmServiceProvider"
             ],
-            "aliases":{  
-                "ScoutApm":"Scoutapm\\Laravel\\Facades\\ScoutApm"
+            "aliases": {
+                "ScoutApm": "Scoutapm\\Laravel\\Facades\\ScoutApm"
             }
         }
     },
-    "config":{  
-        "optimize-autoloader":true
+    "config": {
+        "optimize-autoloader": true,
+        "sort-packages": true
     }
 }
