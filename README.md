@@ -10,7 +10,7 @@ Detailed performance metrics and transaction traces are collected once the scout
 ## Quick Start
 A Scout account is required. [Signup for Scout](https://apm.scoutapm.com/users/sign_up).
 
-    composer require scoutapp/scoutapm-laravel
+    composer require scoutapp/scout-apm-laravel
     
 ### Configuration
 
