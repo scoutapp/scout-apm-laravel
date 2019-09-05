@@ -50,7 +50,11 @@ class ScoutApmServiceProvider extends ServiceProvider
 
     public function wrapEngine(Engine $realEngine) : Engine
     {
-        return new ScoutViewEngineDecorator($realEngine, $this->app->make('scoutapm'));
+        return new ScoutViewEngineDecorator(
+            $realEngine,
+            $this->app->make('scoutapm'),
+            $this->app->make('view')->getFinder()
+        );
     }
 
     public function boot(Kernel $kernel, Agent $agent, LoggerInterface $log)
