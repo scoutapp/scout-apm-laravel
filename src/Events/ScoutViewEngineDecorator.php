@@ -45,6 +45,10 @@ final class ScoutViewEngineDecorator implements Engine
         );
     }
 
+    public function getCompiler() {
+        return $this->realEngine->getCompiler();
+    }
+
     private function determineTemplateNameFromPath(string $path) : string
     {
         $templateName = array_search($path, $this->viewFinder->getViews(), true);
