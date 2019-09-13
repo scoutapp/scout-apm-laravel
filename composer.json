@@ -22,7 +22,6 @@
         "scoutapp/scout-apm-php": "0.2.0"
     },
     "require-dev": {
-        "psr/log": "^1.1",
         "phpunit/phpunit": "6.*",
         "spatie/phpunit-watcher": "^1.8"
     },
