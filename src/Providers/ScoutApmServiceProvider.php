@@ -6,8 +6,8 @@ namespace Scoutapm\Laravel\Providers;
 
 use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Contracts\Foundation\Application;
-use Illuminate\Contracts\Http\Kernel;
 use Illuminate\Contracts\View\Engine;
+use Illuminate\Foundation\Http\Kernel;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\View\Engines\EngineResolver;

@@ -30,7 +30,7 @@ final class ActionInstrument
 
         return $this->agent->webTransaction(
             'unknown',
-            function (Span $span) use ($request, $next) {
+            function (Span $span) use ($request, $next) : Response {
                 $response = $next($request);
 
                 $span->updateName($this->automaticallyDetermineControllerName());
@@ -49,6 +49,7 @@ final class ActionInstrument
         $name = 'unknown';
 
         try {
+            /** @var \Illuminate\Routing\Route|null $route */
             $route = Route::current();
             if ($route !== null) {
                 $name = $route->action['controller'] ?? $route->uri();

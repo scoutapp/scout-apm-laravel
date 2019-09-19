@@ -47,11 +47,16 @@ final class ScoutViewEngineDecorator implements Engine
      * Since Laravel has a nasty habit of exposing public API that is not defined in interfaces, we must expose the
      * getCompiler method commonly used in the actual view engines.
      *
+     * Unfortunately, we have to disable all kinds of static analysis due to this violation :/
+     *
      * @noinspection PhpUnused
      */
     public function getCompiler() : CompilerInterface
     {
-        /** @noinspection PhpUndefinedMethodInspection */
+        /**
+         * @noinspection PhpUndefinedMethodInspection
+         * @psalm-suppress UndefinedInterfaceMethod
+         */
         return $this->realEngine->getCompiler();
     }
 

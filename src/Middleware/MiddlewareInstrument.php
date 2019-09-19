@@ -24,8 +24,12 @@ final class MiddlewareInstrument
     {
         Log::debug('[Scout] Handle MiddlewareInstrument');
 
-        return $this->agent->instrument('Middleware', 'all', static function () use ($request, $next) {
-            return $next($request);
-        });
+        return $this->agent->instrument(
+            'Middleware',
+            'all',
+            static function () use ($request, $next) : Response {
+                return $next($request);
+            }
+        );
     }
 }
