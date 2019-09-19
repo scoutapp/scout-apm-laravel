@@ -11,12 +11,12 @@
         "development"
     ],
     "require": {
-        "php": ">= 7.0",
-        "illuminate/contracts": "5.5.x|5.6.x|5.7.x|5.8.x",
-        "illuminate/http": "5.5.x|5.6.x|5.7.x|5.8.x",
-        "illuminate/routing": "5.5.x|5.6.x|5.7.x|5.8.x",
-        "illuminate/support": "5.5.x|5.6.x|5.7.x|5.8.x",
-        "illuminate/view": "5.5.x|5.6.x|5.7.x|5.8.x",
+        "php": ">= 7.1",
+        "illuminate/contracts": "^5.5.0|^6.0",
+        "illuminate/http": "^5.5.0|^6.0",
+        "illuminate/routing": "^5.5.0|^6.0",
+        "illuminate/support": "^5.5.0|^6.0",
+        "illuminate/view": "^5.5.0|^6.0",
         "ramsey/uuid": "^3.0",
         "psr/log": "^1.0",
         "scoutapp/scout-apm-php": "0.2.0"
