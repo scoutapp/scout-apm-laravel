@@ -1,12 +1,13 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Scoutapm\Laravel\Middleware;
 
-use Illuminate\Http\Request;
-use Scoutapm\Agent;
-
 use Closure;
+use Illuminate\Http\Request;
+use Illuminate\Http\Response;
+use Scoutapm\Agent;
 
 final class IgnoredEndpoints
 {
@@ -18,19 +19,14 @@ final class IgnoredEndpoints
         $this->agent = $agent;
     }
 
-    public function handle(Request $request, Closure $next)
+    public function handle(Request $request, Closure $next) : Response
     {
         // Check if the request path we're handling is configured to be
         // ignored, and if so, mark it as such.
-        if ($this->agent->ignored('/' . $request->path()))
-        {
+        if ($this->agent->ignored('/' . $request->path())) {
             $this->agent->ignore();
         }
 
         return $next($request);
-    }
-
-    public function terminate($request, $response)
-    {
     }
 }

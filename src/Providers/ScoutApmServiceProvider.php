@@ -8,14 +8,12 @@ use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\Http\Kernel;
 use Illuminate\Contracts\View\Engine;
-use Illuminate\Database\Events\QueryExecuted;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\View\Engines\EngineResolver;
 use Psr\Log\LoggerInterface;
 use Scoutapm\Agent;
 use Scoutapm\Config;
-use Scoutapm\Laravel\Commands\DownloadCoreAgent;
 use Scoutapm\Laravel\Database\QueryListener;
 use Scoutapm\Laravel\Middleware\ActionInstrument;
 use Scoutapm\Laravel\Middleware\IgnoredEndpoints;
@@ -76,8 +74,8 @@ final class ScoutApmServiceProvider extends ServiceProvider
      * This installs all the instruments right here. If/when the laravel specific instruments grow, we should extract
      * them to a dedicated instrument manager as we add more.
      */
-    public function installInstruments(Kernel $kernel, Agent $agent) : void {
-
+    public function installInstruments(Kernel $kernel, Agent $agent) : void
+    {
         DB::listen(new QueryListener($agent));
 
         $kernel->prependMiddleware(MiddlewareInstrument::class);

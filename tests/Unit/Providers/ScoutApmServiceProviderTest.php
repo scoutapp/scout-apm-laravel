@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Scoutapm\Laravel\UnitTests\Providers;
 
-use Closure;
 use Illuminate\Contracts\Http\Kernel;
 use Illuminate\Contracts\View\Engine;
 use Illuminate\Contracts\View\View;
@@ -16,8 +15,8 @@ use Illuminate\View\FileViewFinder;
 use Mockery;
 use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 use Mockery\MockInterface;
-use MongoDB\Driver\Query;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Psr\Log\Test\TestLogger;
 use Scoutapm\Agent;
@@ -27,8 +26,8 @@ use Scoutapm\Laravel\Middleware\IgnoredEndpoints;
 use Scoutapm\Laravel\Middleware\MiddlewareInstrument;
 use Scoutapm\Laravel\Middleware\SendRequestToScout;
 use Scoutapm\Laravel\Providers\ScoutApmServiceProvider;
-use PHPUnit\Framework\TestCase;
 use Throwable;
+use function sprintf;
 
 /** @covers \Scoutapm\Laravel\Providers\ScoutApmServiceProvider */
 final class ScoutApmServiceProviderTest extends TestCase
@@ -87,11 +86,9 @@ final class ScoutApmServiceProviderTest extends TestCase
                 'BatchCommand' => [
                     'commands' => [
                         1 => [
-                            'StartSpan' => [
-                                'operation' => 'View/test_template_name',
-                            ]
-                        ]
-                    ]
+                            'StartSpan' => ['operation' => 'View/test_template_name'],
+                        ],
+                    ],
                 ],
             ],
             $agent->getRequest()->jsonSerialize()
@@ -178,7 +175,7 @@ final class ScoutApmServiceProviderTest extends TestCase
                         'render',
                         'name',
                         'with',
-                        'getData'
+                        'getData',
                     ]
                 );
 
@@ -187,13 +184,12 @@ final class ScoutApmServiceProviderTest extends TestCase
 
                 $viewFinderMock
                     ->method('getViews')
-                    ->willReturn([
-                        'test_template_name' => '/path/to/view',
-                    ]);
+                    ->willReturn(['test_template_name' => '/path/to/view']);
 
                 $viewMock->expects(self::once())
                     ->method('getFinder')
                     ->willReturn($viewFinderMock);
+
                 return $viewMock;
             }
         );
@@ -208,12 +204,15 @@ final class ScoutApmServiceProviderTest extends TestCase
                         $viewEngineName,
                         function () use ($viewEngineName) : Engine {
                             return new class ($viewEngineName) implements Engine {
+                                /** @var string */
                                 private $viewEngineName;
+
                                 public function __construct(string $viewEngineName)
                                 {
                                     $this->viewEngineName = $viewEngineName;
                                 }
 
+                                /** @inheritDoc */
                                 public function get($path, array $data = []) : string
                                 {
                                     return sprintf(

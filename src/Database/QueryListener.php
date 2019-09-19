@@ -6,6 +6,7 @@ namespace Scoutapm\Laravel\Database;
 
 use Illuminate\Database\Events\QueryExecuted;
 use Scoutapm\Agent;
+use function microtime;
 
 final class QueryListener
 {

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Scoutapm\Laravel\View\Engine;
 
 use Illuminate\Contracts\View\Engine;
+use Illuminate\View\Compilers\CompilerInterface;
 use Illuminate\View\FileViewFinder;
 use Scoutapm\Agent;
 use function array_search;
@@ -24,18 +25,14 @@ final class ScoutViewEngineDecorator implements Engine
     public function __construct(Engine $realEngine, Agent $agent, FileViewFinder $viewFinder)
     {
         $this->realEngine = $realEngine;
-        $this->agent = $agent;
+        $this->agent      = $agent;
         $this->viewFinder = $viewFinder;
     }
 
     /**
-     * Get the evaluated contents of the view.
-     *
-     * @param string $path
-     * @param array $data
-     * @return string
+     * {@inheritDoc}
      */
-    public function get($path, array $data = [])
+    public function get($path, array $data = []) : string
     {
         return $this->agent->instrument(
             'View',
@@ -52,7 +49,7 @@ final class ScoutViewEngineDecorator implements Engine
      *
      * @noinspection PhpUnused
      */
-    public function getCompiler()
+    public function getCompiler() : CompilerInterface
     {
         /** @noinspection PhpUndefinedMethodInspection */
         return $this->realEngine->getCompiler();

@@ -10,6 +10,8 @@ use Scoutapm\Agent;
 use Scoutapm\Events\Span\Span;
 
 /**
+ * @see \Scoutapm\Agent
+ *
  * @method static void connect()
  * @method static bool enabled()
  * @method static Span startSpan(string $operation, ?float $overrideTimestamp = null)
@@ -22,8 +24,6 @@ use Scoutapm\Events\Span\Span;
  * @method static bool ignored(string $path)
  * @method static void ignore()
  * @method static bool send()
- *
- * @see \Scoutapm\Agent
  */
 final class ScoutApm extends Facade
 {

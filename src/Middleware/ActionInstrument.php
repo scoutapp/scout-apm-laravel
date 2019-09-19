@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace Scoutapm\Laravel\Middleware;
 
-use Exception;
-use Scoutapm\Agent;
-
 use Closure;
+use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Route;
+use Scoutapm\Agent;
 use Scoutapm\Events\Span\Span;
 use Throwable;
 
@@ -24,7 +24,7 @@ final class ActionInstrument
     }
 
     /** @throws Throwable */
-    public function handle($request, Closure $next)
+    public function handle(Request $request, Closure $next) : Response
     {
         Log::debug('[Scout] Handle ActionInstrument');
 
@@ -53,7 +53,7 @@ final class ActionInstrument
             if ($route !== null) {
                 $name = $route->action['controller'] ?? $route->uri();
             }
-        } catch (Exception $e) {
+        } catch (Throwable $e) {
             Log::debug('[Scout] Exception obtaining name of endpoint: getName()', ['exception' => $e]);
         }
 
