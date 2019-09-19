@@ -2,13 +2,14 @@
 
 declare(strict_types=1);
 
-namespace Scoutapm\Laravel\Events;
+namespace Scoutapm\Laravel\View\Engine;
 
 use Illuminate\Contracts\View\Engine;
 use Illuminate\View\FileViewFinder;
 use Scoutapm\Agent;
 use function array_search;
 
+/** @noinspection ContractViolationInspection */
 final class ScoutViewEngineDecorator implements Engine
 {
     /** @var Engine */
@@ -45,7 +46,15 @@ final class ScoutViewEngineDecorator implements Engine
         );
     }
 
-    public function getCompiler() {
+    /**
+     * Since Laravel has a nasty habit of exposing public API that is not defined in interfaces, we must expose the
+     * getCompiler method commonly used in the actual view engines.
+     *
+     * @noinspection PhpUnused
+     */
+    public function getCompiler()
+    {
+        /** @noinspection PhpUndefinedMethodInspection */
         return $this->realEngine->getCompiler();
     }
 

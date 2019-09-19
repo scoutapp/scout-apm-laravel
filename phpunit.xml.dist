@@ -1,17 +1,26 @@
-<phpunit bootstrap="./tests/bootstrap.php"
-  stopOnFailure="true"
-  stopOnError="true"
-  colors="false"
-  verbose="true"
-  processIsolation="false"
-  beStrictAboutChangesToGlobalState="true"
-  beStrictAboutOutputDuringTests="true"
-  beStrictAboutTestsThatDoNotTestAnything="true">
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="vendor/phpunit/phpunit/phpunit.xsd"
+        bootstrap="vendor/autoload.php"
+        colors="true"
+        verbose="true"
+        beStrictAboutOutputDuringTests="true"
+        beStrictAboutChangesToGlobalState="true"
+        beStrictAboutTodoAnnotatedTests="true"
+        forceCoversAnnotation="true"
+>
     <testsuites>
-        <testsuite name="lib">
-            <directory suffix="Test.php">./tests/</directory>
+        <testsuite name="unit">
+            <directory>./tests/Unit</directory>
+        </testsuite>
+        <testsuite name="integration">
+            <directory>./tests/Integration</directory>
         </testsuite>
     </testsuites>
+    <php>
+        <ini name="error_reporting" value="E_ALL" />
+    </php>
     <filter>
         <whitelist processUncoveredFilesFromWhitelist="true">
             <directory>./src/</directory>

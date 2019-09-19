@@ -1,10 +1,12 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Scoutapm\Laravel\Facades;
 
 use Closure;
 use Illuminate\Support\Facades\Facade;
+use Scoutapm\Agent;
 use Scoutapm\Events\Span\Span;
 
 /**
@@ -23,10 +25,10 @@ use Scoutapm\Events\Span\Span;
  *
  * @see \Scoutapm\Agent
  */
-class ScoutApm extends Facade
+final class ScoutApm extends Facade
 {
     protected static function getFacadeAccessor() : string
     {
-        return 'scoutapm';
+        return Agent::class;
     }
 }

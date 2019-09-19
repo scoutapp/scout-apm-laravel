@@ -1,16 +1,18 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Scoutapm\Laravel\Middleware;
 
 use Scoutapm\Agent;
 
 use Closure;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Route;
 
-class SendRequestToScout
+final class SendRequestToScout
 {
-    protected $agent;
+    /** @var Agent */
+    private $agent;
 
     public function __construct(Agent $agent)
     {
@@ -23,9 +25,9 @@ class SendRequestToScout
 
         try {
             $this->agent->send();
-            Log::debug("[Scout] SendRequestToScout succeeded");
+            Log::debug('[Scout] SendRequestToScout succeeded');
         } catch (\Exception $e) {
-            Log::debug("[Scout] SendRequestToScout failed: " . $e);
+            Log::debug('[Scout] SendRequestToScout failed: ' . $e);
         }
 
         return $response;

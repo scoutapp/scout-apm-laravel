@@ -6,9 +6,10 @@ use Closure;
 use Illuminate\Support\Facades\Log;
 use Scoutapm\Agent;
 
-class MiddlewareInstrument
+final class MiddlewareInstrument
 {
-    protected $agent;
+    /** @var Agent */
+    private $agent;
 
     public function __construct(Agent $agent)
     {
@@ -17,13 +18,10 @@ class MiddlewareInstrument
 
     public function handle($request, Closure $next)
     {
-        Log::debug("[Scout] Handle MiddlewareInstrument");
-        $this->agent->startSpan("Middleware/all");
+        Log::debug('[Scout] Handle MiddlewareInstrument');
 
-        $response = $next($request);
-
-        $this->agent->stopSpan();
-
-        return $response;
+        return $this->agent->instrument('Middleware', 'all', static function () use ($request, $next) {
+            return $next($request);
+        });
     }
 }
