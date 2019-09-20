@@ -20,6 +20,7 @@ use Scoutapm\Laravel\Middleware\IgnoredEndpoints;
 use Scoutapm\Laravel\Middleware\MiddlewareInstrument;
 use Scoutapm\Laravel\Middleware\SendRequestToScout;
 use Scoutapm\Laravel\View\Engine\ScoutViewEngineDecorator;
+use Scoutapm\ScoutApmAgent;
 
 final class ScoutApmServiceProvider extends ServiceProvider
 {
@@ -30,14 +31,15 @@ final class ScoutApmServiceProvider extends ServiceProvider
     /** @throws BindingResolutionException */
     public function register() : void
     {
-        $this->app->singleton(Agent::class, static function (Application $app) {
+        $this->app->singleton(ScoutApmAgent::class, static function (Application $app) {
             return Agent::fromConfig(
                 new Config(),
                 $app->make('log')
             );
         });
 
-        $this->app->alias(Agent::class, self::SCOUTAPM_ALIAS_SERVICE_KEY);
+        $this->app->alias(ScoutApmAgent::class, Agent::class);
+        $this->app->alias(ScoutApmAgent::class, self::SCOUTAPM_ALIAS_SERVICE_KEY);
 
         /** @var EngineResolver $viewResolver */
         $viewResolver = $this->app->make('view.engine.resolver');
@@ -56,12 +58,12 @@ final class ScoutApmServiceProvider extends ServiceProvider
     {
         return new ScoutViewEngineDecorator(
             $realEngine,
-            $this->app->make(Agent::class),
+            $this->app->make(ScoutApmAgent::class),
             $this->app->make('view')->getFinder()
         );
     }
 
-    public function boot(Kernel $kernel, Agent $agent, LoggerInterface $log) : void
+    public function boot(Kernel $kernel, ScoutApmAgent $agent, LoggerInterface $log) : void
     {
         $agent->connect();
 
@@ -74,7 +76,7 @@ final class ScoutApmServiceProvider extends ServiceProvider
      * This installs all the instruments right here. If/when the laravel specific instruments grow, we should extract
      * them to a dedicated instrument manager as we add more.
      */
-    public function installInstruments(Kernel $kernel, Agent $agent) : void
+    public function installInstruments(Kernel $kernel, ScoutApmAgent $agent) : void
     {
         DB::listen(new QueryListener($agent));
 

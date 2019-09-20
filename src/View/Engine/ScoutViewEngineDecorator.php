@@ -7,7 +7,7 @@ namespace Scoutapm\Laravel\View\Engine;
 use Illuminate\Contracts\View\Engine;
 use Illuminate\View\Compilers\CompilerInterface;
 use Illuminate\View\FileViewFinder;
-use Scoutapm\Agent;
+use Scoutapm\ScoutApmAgent;
 use function array_search;
 
 /** @noinspection ContractViolationInspection */
@@ -16,13 +16,13 @@ final class ScoutViewEngineDecorator implements Engine
     /** @var Engine */
     private $realEngine;
 
-    /** @var Agent */
+    /** @var ScoutApmAgent */
     private $agent;
 
     /** @var FileViewFinder */
     private $viewFinder;
 
-    public function __construct(Engine $realEngine, Agent $agent, FileViewFinder $viewFinder)
+    public function __construct(Engine $realEngine, ScoutApmAgent $agent, FileViewFinder $viewFinder)
     {
         $this->realEngine = $realEngine;
         $this->agent      = $agent;

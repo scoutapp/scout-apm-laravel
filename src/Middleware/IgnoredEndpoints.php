@@ -7,14 +7,14 @@ namespace Scoutapm\Laravel\Middleware;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
-use Scoutapm\Agent;
+use Scoutapm\ScoutApmAgent;
 
 final class IgnoredEndpoints
 {
-    /** @var Agent */
+    /** @var ScoutApmAgent */
     private $agent;
 
-    public function __construct(Agent $agent)
+    public function __construct(ScoutApmAgent $agent)
     {
         $this->agent = $agent;
     }

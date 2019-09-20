@@ -26,6 +26,7 @@ use Scoutapm\Laravel\Middleware\IgnoredEndpoints;
 use Scoutapm\Laravel\Middleware\MiddlewareInstrument;
 use Scoutapm\Laravel\Middleware\SendRequestToScout;
 use Scoutapm\Laravel\Providers\ScoutApmServiceProvider;
+use Scoutapm\ScoutApmAgent;
 use Throwable;
 use function sprintf;
 
@@ -59,11 +60,13 @@ final class ScoutApmServiceProviderTest extends TestCase
     /** @throws Throwable */
     public function testScoutAgentIsRegistered() : void
     {
+        self::assertFalse($this->application->has(ScoutApmAgent::class));
         self::assertFalse($this->application->has(Agent::class));
         self::assertFalse($this->application->has(self::SCOUTAPM_ALIAS_SERVICE_KEY));
 
         $this->serviceProvider->register();
 
+        self::assertFalse($this->application->has(ScoutApmAgent::class));
         self::assertTrue($this->application->has(Agent::class));
         self::assertTrue($this->application->has(self::SCOUTAPM_ALIAS_SERVICE_KEY));
     }
@@ -80,7 +83,7 @@ final class ScoutApmServiceProviderTest extends TestCase
         self::assertSame('Fake view engine for [file] - rendered path "/path/to/view"', $engine->get('/path/to/view'));
 
         /** @var Agent $agent */
-        $agent = $this->application->make(Agent::class);
+        $agent = $this->application->make(ScoutApmAgent::class);
         self::assertArraySubset(
             [
                 'BatchCommand' => [
@@ -133,7 +136,7 @@ final class ScoutApmServiceProviderTest extends TestCase
         $log = $this->application->make(LoggerInterface::class);
         $this->serviceProvider->boot(
             $this->application->make(Kernel::class),
-            $this->application->make(Agent::class),
+            $this->application->make(ScoutApmAgent::class),
             $log
         );
     }

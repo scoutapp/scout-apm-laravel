@@ -9,16 +9,16 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Route;
-use Scoutapm\Agent;
 use Scoutapm\Events\Span\Span;
+use Scoutapm\ScoutApmAgent;
 use Throwable;
 
 final class ActionInstrument
 {
-    /** @var Agent */
+    /** @var ScoutApmAgent */
     private $agent;
 
-    public function __construct(Agent $agent)
+    public function __construct(ScoutApmAgent $agent)
     {
         $this->agent = $agent;
     }

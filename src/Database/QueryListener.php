@@ -5,15 +5,15 @@ declare(strict_types=1);
 namespace Scoutapm\Laravel\Database;
 
 use Illuminate\Database\Events\QueryExecuted;
-use Scoutapm\Agent;
+use Scoutapm\ScoutApmAgent;
 use function microtime;
 
 final class QueryListener
 {
-    /** @var Agent */
+    /** @var ScoutApmAgent */
     private $agent;
 
-    public function __construct(Agent $agent)
+    public function __construct(ScoutApmAgent $agent)
     {
         $this->agent = $agent;
     }

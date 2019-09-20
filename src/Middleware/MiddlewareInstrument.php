@@ -8,14 +8,14 @@ use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Log;
-use Scoutapm\Agent;
+use Scoutapm\ScoutApmAgent;
 
 final class MiddlewareInstrument
 {
-    /** @var Agent */
+    /** @var ScoutApmAgent */
     private $agent;
 
-    public function __construct(Agent $agent)
+    public function __construct(ScoutApmAgent $agent)
     {
         $this->agent = $agent;
     }
