@@ -12,21 +12,23 @@ use Illuminate\Database\Connection;
 use Illuminate\Foundation\Application;
 use Illuminate\Routing\Router;
 use Illuminate\View\Engines\EngineResolver;
-use Illuminate\View\FileViewFinder;
+use Illuminate\View\Factory as ViewFactory;
 use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
+use PHPUnit\Framework\Constraint\IsType;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
-use Psr\Log\Test\TestLogger;
 use Scoutapm\Agent;
 use Scoutapm\Laravel\Middleware\ActionInstrument;
 use Scoutapm\Laravel\Middleware\IgnoredEndpoints;
 use Scoutapm\Laravel\Middleware\MiddlewareInstrument;
 use Scoutapm\Laravel\Middleware\SendRequestToScout;
 use Scoutapm\Laravel\Providers\ScoutApmServiceProvider;
+use Scoutapm\Laravel\View\Engine\ScoutViewEngineDecorator;
 use Scoutapm\ScoutApmAgent;
 use Throwable;
 use function sprintf;
+use function uniqid;
 
 /** @covers \Scoutapm\Laravel\Providers\ScoutApmServiceProvider */
 final class ScoutApmServiceProviderTest extends TestCase
@@ -75,8 +77,33 @@ final class ScoutApmServiceProviderTest extends TestCase
     {
         $this->serviceProvider->register();
 
+        $templateName = uniqid('test_template_name', true);
+
         /** @var EngineResolver $viewResolver */
         $viewResolver = $this->application->make('view.engine.resolver');
+
+        /** @var ViewFactory&MockObject $viewFactory */
+        $viewFactory = $this->application->make('view');
+        $viewFactory->expects(self::once())
+            ->method('composer')
+            ->with('*', self::isType(IsType::TYPE_CALLABLE))
+            ->willReturnCallback(function (string $whichViews, callable $composer) use ($templateName) : void {
+                /** @var View&MockObject $mockView */
+                $mockView = $this->createMock(View::class);
+                $mockView->expects(self::once())
+                    ->method('name')
+                    ->willReturn($templateName);
+                $composer($mockView);
+            });
+
+        $viewFactory->expects(self::once())
+            ->method('share')
+            ->with(ScoutViewEngineDecorator::VIEW_FACTORY_SHARED_KEY, $templateName);
+
+        $viewFactory->expects(self::once())
+            ->method('shared')
+            ->with(ScoutViewEngineDecorator::VIEW_FACTORY_SHARED_KEY, 'unknown')
+            ->willReturn($templateName);
 
         $engine = $viewResolver->resolve('file');
         self::assertSame('Fake view engine for [file] - rendered path "/path/to/view"', $engine->get('/path/to/view'));
@@ -88,7 +115,7 @@ final class ScoutApmServiceProviderTest extends TestCase
                 'BatchCommand' => [
                     'commands' => [
                         1 => [
-                            'StartSpan' => ['operation' => 'View/test_template_name'],
+                            'StartSpan' => ['operation' => 'View/' . $templateName],
                         ],
                     ],
                 ],
@@ -151,8 +178,8 @@ final class ScoutApmServiceProviderTest extends TestCase
 
         $application->singleton(
             LoggerInterface::class,
-            static function () : LoggerInterface {
-                return new TestLogger();
+            function () : LoggerInterface {
+                return $this->createMock(LoggerInterface::class);
             }
         );
         $application->alias(LoggerInterface::class, 'log');
@@ -166,31 +193,8 @@ final class ScoutApmServiceProviderTest extends TestCase
 
         $application->singleton(
             'view',
-            function () : View {
-                /** @var View&MockObject $viewMock */
-                $viewMock = $this->createPartialMock(
-                    View::class,
-                    [
-                        'getFinder',
-                        'render',
-                        'name',
-                        'with',
-                        'getData',
-                    ]
-                );
-
-                /** @var FileViewFinder&MockObject $viewFinderMock */
-                $viewFinderMock = $this->createMock(FileViewFinder::class);
-
-                $viewFinderMock
-                    ->method('getViews')
-                    ->willReturn(['test_template_name' => '/path/to/view']);
-
-                $viewMock->expects(self::once())
-                    ->method('getFinder')
-                    ->willReturn($viewFinderMock);
-
-                return $viewMock;
+            function () : ViewFactory {
+                return $this->createMock(ViewFactory::class);
             }
         );
 

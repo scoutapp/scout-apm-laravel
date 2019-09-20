@@ -6,27 +6,28 @@ namespace Scoutapm\Laravel\View\Engine;
 
 use Illuminate\Contracts\View\Engine;
 use Illuminate\View\Compilers\CompilerInterface;
-use Illuminate\View\FileViewFinder;
+use Illuminate\View\Factory;
 use Scoutapm\ScoutApmAgent;
-use function array_search;
 
 /** @noinspection ContractViolationInspection */
 final class ScoutViewEngineDecorator implements Engine
 {
+    public const VIEW_FACTORY_SHARED_KEY = '__scout_apm_view_name';
+
     /** @var Engine */
     private $realEngine;
 
     /** @var ScoutApmAgent */
     private $agent;
 
-    /** @var FileViewFinder */
-    private $viewFinder;
+    /** @var Factory */
+    private $viewFactory;
 
-    public function __construct(Engine $realEngine, ScoutApmAgent $agent, FileViewFinder $viewFinder)
+    public function __construct(Engine $realEngine, ScoutApmAgent $agent, Factory $viewFactory)
     {
-        $this->realEngine = $realEngine;
-        $this->agent      = $agent;
-        $this->viewFinder = $viewFinder;
+        $this->realEngine  = $realEngine;
+        $this->agent       = $agent;
+        $this->viewFactory = $viewFactory;
     }
 
     /**
@@ -36,7 +37,7 @@ final class ScoutViewEngineDecorator implements Engine
     {
         return $this->agent->instrument(
             'View',
-            $this->determineTemplateNameFromPath($path),
+            $this->viewFactory->shared(self::VIEW_FACTORY_SHARED_KEY, 'unknown'),
             function () use ($path, $data) {
                 return $this->realEngine->get($path, $data);
             }
@@ -58,16 +59,5 @@ final class ScoutViewEngineDecorator implements Engine
          * @psalm-suppress UndefinedInterfaceMethod
          */
         return $this->realEngine->getCompiler();
-    }
-
-    private function determineTemplateNameFromPath(string $path) : string
-    {
-        $templateName = array_search($path, $this->viewFinder->getViews(), true);
-
-        if ($templateName === false) {
-            return 'unknown';
-        }
-
-        return $templateName;
     }
 }

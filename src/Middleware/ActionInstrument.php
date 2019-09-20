@@ -7,6 +7,7 @@ namespace Scoutapm\Laravel\Middleware;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Routing\Route;
 use Illuminate\Routing\Router;
 use Psr\Log\LoggerInterface;
 use Scoutapm\Events\Span\Span;
@@ -57,6 +58,7 @@ final class ActionInstrument
         $name = 'unknown';
 
         try {
+            /** @var Route|null $route */
             $route = $this->router->current();
             if ($route !== null) {
                 $name = $route->action['controller'] ?? $route->uri();

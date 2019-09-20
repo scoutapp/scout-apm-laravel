@@ -7,11 +7,13 @@ namespace Scoutapm\Laravel\Providers;
 use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\View\Engine;
+use Illuminate\Contracts\View\View;
 use Illuminate\Database\Connection;
 use Illuminate\Database\Events\QueryExecuted;
 use Illuminate\Foundation\Http\Kernel;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\View\Engines\EngineResolver;
+use Illuminate\View\Factory as ViewFactory;
 use Psr\Log\LoggerInterface;
 use Scoutapm\Agent;
 use Scoutapm\Config;
@@ -55,13 +57,20 @@ final class ScoutApmServiceProvider extends ServiceProvider
         }
     }
 
-    /** @throws BindingResolutionException */
     public function wrapEngine(Engine $realEngine) : Engine
     {
+        /** @var ViewFactory $viewFactory */
+        $viewFactory = $this->app->make('view');
+
+        /** @noinspection UnusedFunctionResultInspection */
+        $viewFactory->composer('*', static function (View $view) use ($viewFactory) : void {
+            $viewFactory->share(ScoutViewEngineDecorator::VIEW_FACTORY_SHARED_KEY, $view->name());
+        });
+
         return new ScoutViewEngineDecorator(
             $realEngine,
             $this->app->make(ScoutApmAgent::class),
-            $this->app->make('view')->getFinder()
+            $viewFactory
         );
     }
 

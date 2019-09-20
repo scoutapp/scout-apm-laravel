@@ -6,7 +6,7 @@ namespace Scoutapm\Laravel\UnitTests\View\Engine;
 
 use Illuminate\Contracts\View\Engine;
 use Illuminate\View\Compilers\CompilerInterface;
-use Illuminate\View\FileViewFinder;
+use Illuminate\View\Factory as ViewFactory;
 use PHPUnit\Framework\Constraint\IsType;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
@@ -23,8 +23,8 @@ final class ScoutViewEngineDecoratorTest extends TestCase
     /** @var ScoutApmAgent&MockObject */
     private $agent;
 
-    /** @var FileViewFinder&MockObject */
-    private $viewFinder;
+    /** @var ViewFactory&MockObject */
+    private $viewFactory;
 
     /** @var ScoutViewEngineDecorator */
     private $viewEngineDecorator;
@@ -34,11 +34,11 @@ final class ScoutViewEngineDecoratorTest extends TestCase
         parent::setUp();
 
         // Note: getCompiler is NOT a real method, it is implemented by the real implementation only, SOLID violation in Laravel
-        $this->realEngine = $this->createPartialMock(Engine::class, ['get', 'getCompiler']);
-        $this->agent      = $this->createMock(ScoutApmAgent::class);
-        $this->viewFinder = $this->createMock(FileViewFinder::class);
+        $this->realEngine  = $this->createPartialMock(Engine::class, ['get', 'getCompiler']);
+        $this->agent       = $this->createMock(ScoutApmAgent::class);
+        $this->viewFactory = $this->createMock(ViewFactory::class);
 
-        $this->viewEngineDecorator = new ScoutViewEngineDecorator($this->realEngine, $this->agent, $this->viewFinder);
+        $this->viewEngineDecorator = new ScoutViewEngineDecorator($this->realEngine, $this->agent, $this->viewFactory);
     }
 
     public function testGetWrapsCallToRealEngineInInstrumentation() : void
@@ -48,9 +48,10 @@ final class ScoutViewEngineDecoratorTest extends TestCase
         $data             = ['foo' => 'bar'];
         $renderedString   = uniqid('renderedString', true);
 
-        $this->viewFinder->expects(self::once())
-            ->method('getViews')
-            ->willReturn([$viewTemplateName => $path]);
+        $this->viewFactory->expects(self::once())
+            ->method('shared')
+            ->with(ScoutViewEngineDecorator::VIEW_FACTORY_SHARED_KEY, 'unknown')
+            ->willReturn($viewTemplateName);
 
         $this->agent
             ->expects(self::once())
@@ -74,9 +75,10 @@ final class ScoutViewEngineDecoratorTest extends TestCase
         $data           = ['foo' => 'bar'];
         $renderedString = uniqid('renderedString', true);
 
-        $this->viewFinder->expects(self::once())
-            ->method('getViews')
-            ->willReturn([]);
+        $this->viewFactory->expects(self::once())
+            ->method('shared')
+            ->with(ScoutViewEngineDecorator::VIEW_FACTORY_SHARED_KEY, 'unknown')
+            ->willReturn('unknown');
 
         $this->agent
             ->expects(self::once())
