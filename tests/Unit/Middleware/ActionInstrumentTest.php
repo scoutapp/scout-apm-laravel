@@ -4,19 +4,20 @@ declare(strict_types=1);
 
 namespace Scoutapm\Laravel\UnitTests\Middleware;
 
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Routing\Route;
 use Illuminate\Routing\Router;
-use Mockery\Mock;
 use PHPUnit\Framework\Constraint\IsType;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Scoutapm\Events\Span\Span;
 use Scoutapm\Laravel\Middleware\ActionInstrument;
-use PHPUnit\Framework\TestCase;
 use Scoutapm\ScoutApmAgent;
 use Throwable;
+use function uniqid;
 
 /** @covers \Scoutapm\Laravel\Middleware\ActionInstrument */
 final class ActionInstrumentTest extends TestCase
@@ -40,10 +41,10 @@ final class ActionInstrumentTest extends TestCase
     {
         parent::setUp();
 
-        $this->agent = $this->createMock(ScoutApmAgent::class);
+        $this->agent  = $this->createMock(ScoutApmAgent::class);
         $this->logger = $this->createMock(LoggerInterface::class);
         $this->router = $this->createMock(Router::class);
-        $this->span = $this->createMock(Span::class);
+        $this->span   = $this->createMock(Span::class);
 
         $this->middleware = new ActionInstrument($this->agent, $this->logger, $this->router);
 
@@ -151,7 +152,7 @@ final class ActionInstrumentTest extends TestCase
 
         $this->router->expects(self::once())
             ->method('current')
-            ->willThrowException(new \Exception('oh no'));
+            ->willThrowException(new Exception('oh no'));
 
         $this->span->expects(self::once())
             ->method('updateName')

@@ -9,9 +9,10 @@ use Illuminate\View\Compilers\CompilerInterface;
 use Illuminate\View\FileViewFinder;
 use PHPUnit\Framework\Constraint\IsType;
 use PHPUnit\Framework\MockObject\MockObject;
-use Scoutapm\Laravel\View\Engine\ScoutViewEngineDecorator;
 use PHPUnit\Framework\TestCase;
+use Scoutapm\Laravel\View\Engine\ScoutViewEngineDecorator;
 use Scoutapm\ScoutApmAgent;
+use function uniqid;
 
 /** @covers \Scoutapm\Laravel\View\Engine\ScoutViewEngineDecorator */
 final class ScoutViewEngineDecoratorTest extends TestCase
@@ -34,7 +35,7 @@ final class ScoutViewEngineDecoratorTest extends TestCase
 
         // Note: getCompiler is NOT a real method, it is implemented by the real implementation only, SOLID violation in Laravel
         $this->realEngine = $this->createPartialMock(Engine::class, ['get', 'getCompiler']);
-        $this->agent = $this->createMock(ScoutApmAgent::class);
+        $this->agent      = $this->createMock(ScoutApmAgent::class);
         $this->viewFinder = $this->createMock(FileViewFinder::class);
 
         $this->viewEngineDecorator = new ScoutViewEngineDecorator($this->realEngine, $this->agent, $this->viewFinder);
@@ -43,9 +44,9 @@ final class ScoutViewEngineDecoratorTest extends TestCase
     public function testGetWrapsCallToRealEngineInInstrumentation() : void
     {
         $viewTemplateName = uniqid('viewTemplateName', true);
-        $path = uniqid('path', true);
-        $data = ['foo' => 'bar'];
-        $renderedString = uniqid('renderedString', true);
+        $path             = uniqid('path', true);
+        $data             = ['foo' => 'bar'];
+        $renderedString   = uniqid('renderedString', true);
 
         $this->viewFinder->expects(self::once())
             ->method('getViews')
@@ -69,8 +70,8 @@ final class ScoutViewEngineDecoratorTest extends TestCase
 
     public function testGetFallsBackToUnknownTemplateNameWhenPathWasNotDefined() : void
     {
-        $path = uniqid('path', true);
-        $data = ['foo' => 'bar'];
+        $path           = uniqid('path', true);
+        $data           = ['foo' => 'bar'];
         $renderedString = uniqid('renderedString', true);
 
         $this->viewFinder->expects(self::once())

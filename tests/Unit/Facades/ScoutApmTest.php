@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Scoutapm\Laravel\UnitTests\Facades;
 
 use PHPUnit\Framework\MockObject\MockObject;
-use Scoutapm\Laravel\Facades\ScoutApm as ScoutApmFacade;
 use PHPUnit\Framework\TestCase;
+use Scoutapm\Laravel\Facades\ScoutApm as ScoutApmFacade;
 use Scoutapm\ScoutApmAgent;
 
 /** @covers \Scoutapm\Laravel\Facades\ScoutApm */
@@ -25,16 +25,22 @@ final class ScoutApmTest extends TestCase
         ScoutApmFacade::swap($this->agent);
     }
 
+    /**
+     * @return string[][]|string[][][]|null[][][]|callable[][][]
+     */
     public function proxiedMethodsProvider() : array
     {
+        $callable = static function () : void {
+        };
+
         return [
             ['connect', []],
             ['enabled', []],
             ['startSpan', ['operation', null]],
             ['stopSpan', []],
-            ['instrument', ['type', 'name', static function () {}]],
-            ['webTransaction', ['name', static function () {}]],
-            ['backgroundTransaction', ['name', static function () {}]],
+            ['instrument', ['type', 'name', $callable]],
+            ['webTransaction', ['name', $callable]],
+            ['backgroundTransaction', ['name', $callable]],
             ['addContext', ['tag', 'value']],
             ['tagRequest', ['tag', 'value']],
             ['ignored', ['tag']],
@@ -45,6 +51,7 @@ final class ScoutApmTest extends TestCase
 
     /**
      * @param mixed[] $args
+     *
      * @dataProvider proxiedMethodsProvider
      */
     public function testFacadeProxiesMethodsToRealAgent(string $method, array $args) : void

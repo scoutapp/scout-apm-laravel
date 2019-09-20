@@ -8,9 +8,9 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use PHPUnit\Framework\Constraint\IsType;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Scoutapm\Laravel\Middleware\MiddlewareInstrument;
-use PHPUnit\Framework\TestCase;
 use Scoutapm\ScoutApmAgent;
 
 /** @covers \Scoutapm\Laravel\Middleware\MiddlewareInstrument */
@@ -29,7 +29,7 @@ final class MiddlewareInstrumentTest extends TestCase
     {
         parent::setUp();
 
-        $this->agent = $this->createMock(ScoutApmAgent::class);
+        $this->agent  = $this->createMock(ScoutApmAgent::class);
         $this->logger = $this->createMock(LoggerInterface::class);
 
         $this->middleware = new MiddlewareInstrument($this->agent, $this->logger);

@@ -26,7 +26,7 @@ final class ActionInstrument
 
     public function __construct(ScoutApmAgent $agent, LoggerInterface $logger, Router $router)
     {
-        $this->agent = $agent;
+        $this->agent  = $agent;
         $this->logger = $logger;
         $this->router = $router;
     }

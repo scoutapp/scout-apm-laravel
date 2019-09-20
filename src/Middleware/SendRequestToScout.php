@@ -21,7 +21,7 @@ final class SendRequestToScout
 
     public function __construct(ScoutApmAgent $agent, LoggerInterface $logger)
     {
-        $this->agent = $agent;
+        $this->agent  = $agent;
         $this->logger = $logger;
     }
 

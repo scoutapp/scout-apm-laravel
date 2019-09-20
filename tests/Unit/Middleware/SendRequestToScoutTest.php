@@ -8,9 +8,9 @@ use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Scoutapm\Laravel\Middleware\SendRequestToScout;
-use PHPUnit\Framework\TestCase;
 use Scoutapm\ScoutApmAgent;
 
 /** @covers \Scoutapm\Laravel\Middleware\SendRequestToScout */
@@ -29,7 +29,7 @@ final class SendRequestToScoutTest extends TestCase
     {
         parent::setUp();
 
-        $this->agent = $this->createMock(ScoutApmAgent::class);
+        $this->agent  = $this->createMock(ScoutApmAgent::class);
         $this->logger = $this->createMock(LoggerInterface::class);
 
         $this->middleware = new SendRequestToScout($this->agent, $this->logger);

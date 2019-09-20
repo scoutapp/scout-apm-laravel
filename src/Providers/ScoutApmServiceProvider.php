@@ -80,7 +80,7 @@ final class ScoutApmServiceProvider extends ServiceProvider
      */
     public function installInstruments(Kernel $kernel, ScoutApmAgent $agent, Connection $connection) : void
     {
-        $connection->listen(static function (QueryExecuted $query) use ($agent) {
+        $connection->listen(static function (QueryExecuted $query) use ($agent) : void {
             (new QueryListener($agent))->__invoke($query);
         });
 

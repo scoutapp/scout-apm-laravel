@@ -22,7 +22,7 @@ final class QueryListenerTest extends TestCase
     /** @var QueryListener */
     private $queryListener;
 
-    public function setUp()
+    public function setUp() : void
     {
         parent::setUp();
 
@@ -33,8 +33,7 @@ final class QueryListenerTest extends TestCase
 
     public function testSqlQueryIsLogged() : void
     {
-        $time = 1000;
-        $query = new QueryExecuted('SELECT 1', [], $time, $this->createMock(Connection::class));
+        $query = new QueryExecuted('SELECT 1', [], 1000, $this->createMock(Connection::class));
 
         /** @var Span&MockObject $spanMock */
         $spanMock = $this->createMock(Span::class);

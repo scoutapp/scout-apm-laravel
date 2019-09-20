@@ -4,25 +4,21 @@ declare(strict_types=1);
 
 namespace Scoutapm\Laravel\UnitTests\Providers;
 
+use Closure;
 use Illuminate\Contracts\Http\Kernel;
 use Illuminate\Contracts\View\Engine;
 use Illuminate\Contracts\View\View;
 use Illuminate\Database\Connection;
 use Illuminate\Foundation\Application;
 use Illuminate\Routing\Router;
-use Illuminate\Support\Facades\DB;
 use Illuminate\View\Engines\EngineResolver;
 use Illuminate\View\FileViewFinder;
-use Mockery;
 use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
-use Mockery\MockInterface;
-use PHPUnit\Framework\Constraint\IsType;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Psr\Log\Test\TestLogger;
 use Scoutapm\Agent;
-use Scoutapm\Laravel\Database\QueryListener;
 use Scoutapm\Laravel\Middleware\ActionInstrument;
 use Scoutapm\Laravel\Middleware\IgnoredEndpoints;
 use Scoutapm\Laravel\Middleware\MiddlewareInstrument;
@@ -55,7 +51,7 @@ final class ScoutApmServiceProviderTest extends TestCase
         parent::setUp();
 
         $this->application = $this->createLaravelApplicationFulfillingBasicRequirementsForScout();
-        $this->connection = $this->createMock(Connection::class);
+        $this->connection  = $this->createMock(Connection::class);
 
         $this->serviceProvider = new ScoutApmServiceProvider($this->application);
     }
@@ -129,7 +125,7 @@ final class ScoutApmServiceProviderTest extends TestCase
 
         $this->connection->expects(self::once())
             ->method('listen')
-            ->with(self::isInstanceOf(\Closure::class));
+            ->with(self::isInstanceOf(Closure::class));
 
         $this->bootServiceProvider();
     }
