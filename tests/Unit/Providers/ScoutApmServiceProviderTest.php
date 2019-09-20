@@ -66,7 +66,7 @@ final class ScoutApmServiceProviderTest extends TestCase
 
         $this->serviceProvider->register();
 
-        self::assertFalse($this->application->has(ScoutApmAgent::class));
+        self::assertTrue($this->application->has(ScoutApmAgent::class));
         self::assertTrue($this->application->has(Agent::class));
         self::assertTrue($this->application->has(self::SCOUTAPM_ALIAS_SERVICE_KEY));
     }
