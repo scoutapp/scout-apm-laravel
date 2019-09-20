@@ -7,8 +7,8 @@ namespace Scoutapm\Laravel\Middleware;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Route;
+use Illuminate\Routing\Router;
+use Psr\Log\LoggerInterface;
 use Scoutapm\Events\Span\Span;
 use Scoutapm\ScoutApmAgent;
 use Throwable;
@@ -18,15 +18,23 @@ final class ActionInstrument
     /** @var ScoutApmAgent */
     private $agent;
 
-    public function __construct(ScoutApmAgent $agent)
+    /** @var LoggerInterface */
+    private $logger;
+
+    /** @var Router */
+    private $router;
+
+    public function __construct(ScoutApmAgent $agent, LoggerInterface $logger, Router $router)
     {
         $this->agent = $agent;
+        $this->logger = $logger;
+        $this->router = $router;
     }
 
     /** @throws Throwable */
     public function handle(Request $request, Closure $next) : Response
     {
-        Log::debug('[Scout] Handle ActionInstrument');
+        $this->logger->debug('[Scout] Handle ActionInstrument');
 
         return $this->agent->webTransaction(
             'unknown',
@@ -49,13 +57,12 @@ final class ActionInstrument
         $name = 'unknown';
 
         try {
-            /** @var \Illuminate\Routing\Route|null $route */
-            $route = Route::current();
+            $route = $this->router->current();
             if ($route !== null) {
                 $name = $route->action['controller'] ?? $route->uri();
             }
         } catch (Throwable $e) {
-            Log::debug('[Scout] Exception obtaining name of endpoint: getName()', ['exception' => $e]);
+            $this->logger->debug('[Scout] Exception obtaining name of endpoint: getName()', ['exception' => $e]);
         }
 
         return 'Controller/' . $name;

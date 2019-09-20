@@ -7,6 +7,7 @@ namespace Scoutapm\Laravel\UnitTests\Providers;
 use Illuminate\Contracts\Http\Kernel;
 use Illuminate\Contracts\View\Engine;
 use Illuminate\Contracts\View\View;
+use Illuminate\Database\Connection;
 use Illuminate\Foundation\Application;
 use Illuminate\Routing\Router;
 use Illuminate\Support\Facades\DB;
@@ -15,6 +16,7 @@ use Illuminate\View\FileViewFinder;
 use Mockery;
 use Mockery\Adapter\Phpunit\MockeryPHPUnitIntegration;
 use Mockery\MockInterface;
+use PHPUnit\Framework\Constraint\IsType;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
@@ -45,14 +47,15 @@ final class ScoutApmServiceProviderTest extends TestCase
     /** @var ScoutApmServiceProvider */
     private $serviceProvider;
 
-    /** @var MockInterface */
-    private $dbFacadeMockery;
+    /** @var Connection&MockObject */
+    private $connection;
 
     public function setUp() : void
     {
         parent::setUp();
 
         $this->application = $this->createLaravelApplicationFulfillingBasicRequirementsForScout();
+        $this->connection = $this->createMock(Connection::class);
 
         $this->serviceProvider = new ScoutApmServiceProvider($this->application);
     }
@@ -124,9 +127,9 @@ final class ScoutApmServiceProviderTest extends TestCase
     {
         $this->serviceProvider->register();
 
-        $this->dbFacadeMockery->shouldReceive('listen')
-            ->once()
-            ->with(Mockery::type(QueryListener::class));
+        $this->connection->expects(self::once())
+            ->method('listen')
+            ->with(self::isInstanceOf(\Closure::class));
 
         $this->bootServiceProvider();
     }
@@ -137,7 +140,8 @@ final class ScoutApmServiceProviderTest extends TestCase
         $this->serviceProvider->boot(
             $this->application->make(Kernel::class),
             $this->application->make(ScoutApmAgent::class),
-            $log
+            $log,
+            $this->connection
         );
     }
 
@@ -148,9 +152,6 @@ final class ScoutApmServiceProviderTest extends TestCase
     private function createLaravelApplicationFulfillingBasicRequirementsForScout() : Application
     {
         $application = new Application();
-
-        DB::clearResolvedInstances();
-        $this->dbFacadeMockery = DB::spy();
 
         $application->singleton(
             LoggerInterface::class,

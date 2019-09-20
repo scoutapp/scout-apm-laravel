@@ -7,7 +7,7 @@ namespace Scoutapm\Laravel\Middleware;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
-use Illuminate\Support\Facades\Log;
+use Psr\Log\LoggerInterface;
 use Scoutapm\ScoutApmAgent;
 use Throwable;
 
@@ -16,9 +16,13 @@ final class SendRequestToScout
     /** @var ScoutApmAgent */
     private $agent;
 
-    public function __construct(ScoutApmAgent $agent)
+    /** @var LoggerInterface */
+    private $logger;
+
+    public function __construct(ScoutApmAgent $agent, LoggerInterface $logger)
     {
         $this->agent = $agent;
+        $this->logger = $logger;
     }
 
     public function handle(Request $request, Closure $next) : Response
@@ -27,9 +31,9 @@ final class SendRequestToScout
 
         try {
             $this->agent->send();
-            Log::debug('[Scout] SendRequestToScout succeeded');
+            $this->logger->debug('[Scout] SendRequestToScout succeeded');
         } catch (Throwable $e) {
-            Log::debug('[Scout] SendRequestToScout failed: ' . $e);
+            $this->logger->debug('[Scout] SendRequestToScout failed: ' . $e);
         }
 
         return $response;
