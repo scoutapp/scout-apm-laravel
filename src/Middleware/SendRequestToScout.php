@@ -33,7 +33,7 @@ final class SendRequestToScout
             $this->agent->send();
             $this->logger->debug('[Scout] SendRequestToScout succeeded');
         } catch (Throwable $e) {
-            $this->logger->debug('[Scout] SendRequestToScout failed: ' . $e);
+            $this->logger->debug('[Scout] SendRequestToScout failed: ' . $e->getMessage(), ['exception' => $e]);
         }
 
         return $response;

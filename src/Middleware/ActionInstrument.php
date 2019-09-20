@@ -62,7 +62,10 @@ final class ActionInstrument
                 $name = $route->action['controller'] ?? $route->uri();
             }
         } catch (Throwable $e) {
-            $this->logger->debug('[Scout] Exception obtaining name of endpoint: getName()', ['exception' => $e]);
+            $this->logger->debug(
+                '[Scout] Exception obtaining name of endpoint: ' . $e->getMessage(),
+                ['exception' => $e]
+            );
         }
 
         return 'Controller/' . $name;
