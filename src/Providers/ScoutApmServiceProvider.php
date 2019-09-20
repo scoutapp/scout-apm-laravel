@@ -38,6 +38,7 @@ final class ScoutApmServiceProvider extends ServiceProvider
             );
         });
 
+        // @todo note - these aliases are only for backwards compatibility; but since we're early on, we could just remove?
         $this->app->alias(ScoutApmAgent::class, Agent::class);
         $this->app->alias(ScoutApmAgent::class, self::SCOUTAPM_ALIAS_SERVICE_KEY);
 
