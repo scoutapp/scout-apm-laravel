@@ -8,6 +8,7 @@ use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\View\Engine;
 use Illuminate\Database\Connection;
+use Illuminate\Database\Events\QueryExecuted;
 use Illuminate\Foundation\Http\Kernel;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\View\Engines\EngineResolver;
@@ -79,7 +80,7 @@ final class ScoutApmServiceProvider extends ServiceProvider
      */
     public function installInstruments(Kernel $kernel, ScoutApmAgent $agent, Connection $connection) : void
     {
-        $connection->listen(static function ($query) use ($agent) {
+        $connection->listen(static function (QueryExecuted $query) use ($agent) {
             (new QueryListener($agent))->__invoke($query);
         });
 
