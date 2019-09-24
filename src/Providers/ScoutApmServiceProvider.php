@@ -27,8 +27,6 @@ use Scoutapm\ScoutApmAgent;
 
 final class ScoutApmServiceProvider extends ServiceProvider
 {
-    private const SCOUTAPM_ALIAS_SERVICE_KEY = 'scoutapm';
-
     private const VIEW_ENGINES_TO_WRAP = ['file', 'php', 'blade'];
 
     /** @throws BindingResolutionException */
@@ -40,10 +38,6 @@ final class ScoutApmServiceProvider extends ServiceProvider
                 $app->make('log')
             );
         });
-
-        // @todo note - these aliases are only for backwards compatibility; but since we're early on, we could just remove?
-        $this->app->alias(ScoutApmAgent::class, Agent::class);
-        $this->app->alias(ScoutApmAgent::class, self::SCOUTAPM_ALIAS_SERVICE_KEY);
 
         /** @var EngineResolver $viewResolver */
         $viewResolver = $this->app->make('view.engine.resolver');
