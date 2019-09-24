@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Scoutapm\Laravel\Facades;
@@ -6,8 +7,11 @@ namespace Scoutapm\Laravel\Facades;
 use Closure;
 use Illuminate\Support\Facades\Facade;
 use Scoutapm\Events\Span\Span;
+use Scoutapm\ScoutApmAgent;
 
 /**
+ * @see \Scoutapm\ScoutApmAgent
+ *
  * @method static void connect()
  * @method static bool enabled()
  * @method static Span startSpan(string $operation, ?float $overrideTimestamp = null)
@@ -20,13 +24,11 @@ use Scoutapm\Events\Span\Span;
  * @method static bool ignored(string $path)
  * @method static void ignore()
  * @method static bool send()
- *
- * @see \Scoutapm\Agent
  */
-class ScoutApm extends Facade
+final class ScoutApm extends Facade
 {
     protected static function getFacadeAccessor() : string
     {
-        return 'scoutapm';
+        return ScoutApmAgent::class;
     }
 }

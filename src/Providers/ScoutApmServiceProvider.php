@@ -1,47 +1,50 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Scoutapm\Laravel\Providers;
 
-use Illuminate\Contracts\Http\Kernel;
+use Illuminate\Contracts\Container\BindingResolutionException;
+use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\View\Engine;
+use Illuminate\Contracts\View\View;
+use Illuminate\Database\Connection;
 use Illuminate\Database\Events\QueryExecuted;
-use Illuminate\Support\Facades\DB;
+use Illuminate\Foundation\Http\Kernel;
 use Illuminate\Support\ServiceProvider;
-
 use Illuminate\View\Engines\EngineResolver;
-use Scoutapm\Agent;
+use Illuminate\View\Factory as ViewFactory;
 use Psr\Log\LoggerInterface;
-
+use Scoutapm\Agent;
 use Scoutapm\Config;
-use Scoutapm\Laravel\Commands\DownloadCoreAgent;
-use Scoutapm\Laravel\Events\ScoutViewEngineDecorator;
+use Scoutapm\Laravel\Database\QueryListener;
 use Scoutapm\Laravel\Middleware\ActionInstrument;
+use Scoutapm\Laravel\Middleware\IgnoredEndpoints;
 use Scoutapm\Laravel\Middleware\MiddlewareInstrument;
 use Scoutapm\Laravel\Middleware\SendRequestToScout;
-use Scoutapm\Laravel\Middleware\IgnoredEndpoints;
+use Scoutapm\Laravel\View\Engine\ScoutViewEngineDecorator;
+use Scoutapm\ScoutApmAgent;
 
-
-class ScoutApmServiceProvider extends ServiceProvider
+final class ScoutApmServiceProvider extends ServiceProvider
 {
-    public function register()
-    {
-        // No events currently mapped. May be needed in the future.
-        // $this->app->register(EventServiceProvider::class);
+    private const VIEW_ENGINES_TO_WRAP = ['file', 'php', 'blade'];
 
-        $this->app->singleton(Agent::class, function ($app) {
+    /** @throws BindingResolutionException */
+    public function register() : void
+    {
+        $this->app->singleton(ScoutApmAgent::class, static function (Application $app) {
             return Agent::fromConfig(
                 new Config(),
-                $this->app->make('log')
+                $app->make('log')
             );
         });
-
-        $this->app->alias(Agent::class, 'scoutapm');
 
         /** @var EngineResolver $viewResolver */
         $viewResolver = $this->app->make('view.engine.resolver');
 
-        foreach (['file', 'php', 'blade'] as $engineName) {
+        foreach (self::VIEW_ENGINES_TO_WRAP as $engineName) {
             $realEngine = $viewResolver->resolve($engineName);
+
             $viewResolver->register($engineName, function () use ($realEngine) {
                 return $this->wrapEngine($realEngine);
             });
@@ -50,52 +53,45 @@ class ScoutApmServiceProvider extends ServiceProvider
 
     public function wrapEngine(Engine $realEngine) : Engine
     {
+        /** @var ViewFactory $viewFactory */
+        $viewFactory = $this->app->make('view');
+
+        /** @noinspection UnusedFunctionResultInspection */
+        $viewFactory->composer('*', static function (View $view) use ($viewFactory) : void {
+            $viewFactory->share(ScoutViewEngineDecorator::VIEW_FACTORY_SHARED_KEY, $view->name());
+        });
+
         return new ScoutViewEngineDecorator(
             $realEngine,
-            $this->app->make('scoutapm'),
-            $this->app->make('view')->getFinder()
+            $this->app->make(ScoutApmAgent::class),
+            $viewFactory
         );
     }
 
-    public function boot(Kernel $kernel, Agent $agent, LoggerInterface $log)
+    public function boot(Kernel $kernel, ScoutApmAgent $agent, LoggerInterface $log, Connection $connection) : void
     {
         $agent->connect();
 
-        $log->debug("[Scout] Agent is starting");
+        $log->debug('[Scout] Agent is starting');
 
-        $this->installInstruments($kernel, $agent);
-
-        if ($this->app->runningInConsole()) {
-            $this->commands([DownloadCoreAgent::class]);
-        }
-
+        $this->installInstruments($kernel, $agent, $connection);
     }
 
-    //////////////
-    // This installs all the instruments right here. If/when the laravel
-    // specific instruments grow, we should extract them to a dedicated
-    // instrument manager as we add more.
-    public function installInstruments(Kernel $kernel, Agent $agent) {
-        // View::composer('*', ViewComposer::class);
-        // View::creator('*', ViewCreator::class);
-
-        DB::listen(function (QueryExecuted $query) use ($agent) {
-            $startingTime = microtime(true) - ($query->time / 1000);
-            $span = $agent->startSpan('SQL/Query', $startingTime);
-            $span->tag('db.statement', $query->sql);
-            $agent->stopSpan();
-
-            // TODO: figure out how to capture code location in a generic way (also specifically for db calls)
-            // From Laravel DebugBar - https://github.com/barryvdh/laravel-debugbar/blob/master/src/DataCollector/QueryCollector.php#L193
+    /**
+     * This installs all the instruments right here. If/when the laravel specific instruments grow, we should extract
+     * them to a dedicated instrument manager as we add more.
+     */
+    public function installInstruments(Kernel $kernel, ScoutApmAgent $agent, Connection $connection) : void
+    {
+        $connection->listen(static function (QueryExecuted $query) use ($agent) : void {
+            (new QueryListener($agent))->__invoke($query);
         });
 
         $kernel->prependMiddleware(MiddlewareInstrument::class);
         $kernel->pushMiddleware(ActionInstrument::class);
 
-        // Must be outside any other scout
-        // instruments. When this middleware's
-        // terminate is called, it will complete the
-        // request, and send it to the CoreAgent.
+        // Must be outside any other scout instruments. When this middleware's terminate is called, it will complete
+        // the request, and send it to the CoreAgent.
         $kernel->prependMiddleware(IgnoredEndpoints::class);
         $kernel->prependMiddleware(SendRequestToScout::class);
     }

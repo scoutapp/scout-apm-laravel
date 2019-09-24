@@ -1,52 +1,75 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Scoutapm\Laravel\Middleware;
 
-use Scoutapm\Agent;
-
 use Closure;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Route;
+use Illuminate\Http\Request;
+use Illuminate\Http\Response;
+use Illuminate\Routing\Route;
+use Illuminate\Routing\Router;
+use Psr\Log\LoggerInterface;
+use Scoutapm\Events\Span\Span;
+use Scoutapm\ScoutApmAgent;
+use Throwable;
 
-class ActionInstrument
+final class ActionInstrument
 {
-    protected $agent;
+    /** @var ScoutApmAgent */
+    private $agent;
 
-    public function __construct(Agent $agent)
+    /** @var LoggerInterface */
+    private $logger;
+
+    /** @var Router */
+    private $router;
+
+    public function __construct(ScoutApmAgent $agent, LoggerInterface $logger, Router $router)
     {
-        $this->agent = $agent;
+        $this->agent  = $agent;
+        $this->logger = $logger;
+        $this->router = $router;
     }
 
-    public function handle($request, Closure $next)
+    /** @throws Throwable */
+    public function handle(Request $request, Closure $next) : Response
     {
-        Log::debug("[Scout] Handle ActionInstrument");
+        $this->logger->debug('[Scout] Handle ActionInstrument');
 
-        $span = $this->agent->startSpan("Controller/unknown");
+        return $this->agent->webTransaction(
+            'unknown',
+            function (Span $span) use ($request, $next) : Response {
+                $response = $next($request);
 
-        $response = $next($request);
+                $span->updateName($this->automaticallyDetermineControllerName());
 
-        $span->updateName($this->getName());
-        $this->agent->stopSpan();
-
-        return $response;
-    }
-
-    // Get the name of the controller span from the controller name if
-    // possible, but fall back on the uri if no controller was found.
-    public function getName() {
-        $name = 'unknown';
-        try {
-            $route = Route::current();
-            if ($route != null) {
-                $name = $route->uri();
-                if (isset($route->action['controller'])) {
-                    $name =  $route->action['controller'];
-                }
+                return $response;
             }
-        } catch (\Exception $e) { 
-            Log::debug("[Scout] Exception obtaining name of endpoint: getName()");
+        );
+    }
+
+    /**
+     * Get the name of the controller span from the controller name if possible, but fall back on the uri if no
+     * controller was found.
+     */
+    private function automaticallyDetermineControllerName() : string
+    {
+        $name = 'unknown';
+
+        try {
+            /** @var Route|null $route */
+            $route = $this->router->current();
+            if ($route !== null) {
+                $name = $route->action['controller'] ?? $route->uri();
+            }
+        } catch (Throwable $e) {
+            $this->logger->debug(
+                '[Scout] Exception obtaining name of endpoint: ' . $e->getMessage(),
+                ['exception' => $e]
+            );
         }
 
-        return 'Controller/'.$name;
+        return 'Controller/' . $name;
     }
 }

@@ -1,29 +1,39 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Scoutapm\Laravel\Middleware;
 
 use Closure;
-use Illuminate\Support\Facades\Log;
-use Scoutapm\Agent;
+use Illuminate\Http\Request;
+use Illuminate\Http\Response;
+use Psr\Log\LoggerInterface;
+use Scoutapm\ScoutApmAgent;
 
-class MiddlewareInstrument
+final class MiddlewareInstrument
 {
-    protected $agent;
+    /** @var ScoutApmAgent */
+    private $agent;
 
-    public function __construct(Agent $agent)
+    /** @var LoggerInterface */
+    private $logger;
+
+    public function __construct(ScoutApmAgent $agent, LoggerInterface $logger)
     {
-        $this->agent = $agent;
+        $this->agent  = $agent;
+        $this->logger = $logger;
     }
 
-    public function handle($request, Closure $next)
+    public function handle(Request $request, Closure $next) : Response
     {
-        Log::debug("[Scout] Handle MiddlewareInstrument");
-        $this->agent->startSpan("Middleware/all");
+        $this->logger->debug('[Scout] Handle MiddlewareInstrument');
 
-        $response = $next($request);
-
-        $this->agent->stopSpan();
-
-        return $response;
+        return $this->agent->instrument(
+            'Middleware',
+            'all',
+            static function () use ($request, $next) : Response {
+                return $next($request);
+            }
+        );
     }
 }
