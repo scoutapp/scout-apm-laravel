@@ -35,8 +35,6 @@ final class ScoutApmServiceProviderTest extends TestCase
 {
     use MockeryPHPUnitIntegration;
 
-    private const SCOUTAPM_ALIAS_SERVICE_KEY = 'scoutapm';
-
     private const VIEW_ENGINES_TO_WRAP = ['file', 'php', 'blade'];
 
     /** @var Application */
