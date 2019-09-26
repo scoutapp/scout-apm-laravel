@@ -6,11 +6,11 @@ namespace Scoutapm\Laravel\Providers;
 
 use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Contracts\Http\Kernel;
 use Illuminate\Contracts\View\Engine;
 use Illuminate\Contracts\View\View;
 use Illuminate\Database\Connection;
 use Illuminate\Database\Events\QueryExecuted;
-use Illuminate\Foundation\Http\Kernel;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\View\Engines\EngineResolver;
 use Illuminate\View\Factory as ViewFactory;
@@ -68,6 +68,7 @@ final class ScoutApmServiceProvider extends ServiceProvider
         );
     }
 
+    /** @param \Illuminate\Foundation\Http\Kernel $kernel */
     public function boot(Kernel $kernel, ScoutApmAgent $agent, LoggerInterface $log, Connection $connection) : void
     {
         $agent->connect();
@@ -80,6 +81,8 @@ final class ScoutApmServiceProvider extends ServiceProvider
     /**
      * This installs all the instruments right here. If/when the laravel specific instruments grow, we should extract
      * them to a dedicated instrument manager as we add more.
+     *
+     * @param \Illuminate\Foundation\Http\Kernel $kernel
      */
     public function installInstruments(Kernel $kernel, ScoutApmAgent $agent, Connection $connection) : void
     {
