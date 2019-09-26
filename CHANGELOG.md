@@ -7,6 +7,13 @@
 ### Fixed
 
 
+## [0.2.2] 2019-09-26
+
+### Fixed
+
+* CoreAgent now only connects during web requests, not other situations
+* Updates to underlying scout-apm-php v0.2.2
+
 ## [0.2.1] 2019-09-25
 
 ### Added
