@@ -6,7 +6,6 @@ namespace Scoutapm\Laravel\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
 use Illuminate\Routing\Route;
 use Illuminate\Routing\Router;
 use Psr\Log\LoggerInterface;
@@ -33,13 +32,13 @@ final class ActionInstrument
     }
 
     /** @throws Throwable */
-    public function handle(Request $request, Closure $next) : Response
+    public function handle(Request $request, Closure $next)
     {
         $this->logger->debug('[Scout] Handle ActionInstrument');
 
         return $this->agent->webTransaction(
             'unknown',
-            function (Span $span) use ($request, $next) : Response {
+            function (Span $span) use ($request, $next) {
                 $response = $next($request);
 
                 $span->updateName($this->automaticallyDetermineControllerName());
