@@ -27,6 +27,8 @@ final class SendRequestToScout
 
     public function handle(Request $request, Closure $next) : Response
     {
+        $this->agent->connect();
+
         $response = $next($request);
 
         try {

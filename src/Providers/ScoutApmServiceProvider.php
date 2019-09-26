@@ -71,8 +71,6 @@ final class ScoutApmServiceProvider extends ServiceProvider
     /** @param \Illuminate\Foundation\Http\Kernel $kernel */
     public function boot(Kernel $kernel, ScoutApmAgent $agent, LoggerInterface $log, Connection $connection) : void
     {
-        $agent->connect();
-
         $log->debug('[Scout] Agent is starting');
 
         $this->installInstruments($kernel, $agent, $connection);
