@@ -6,7 +6,6 @@ namespace Scoutapm\Laravel\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
 use Psr\Log\LoggerInterface;
 use Scoutapm\ScoutApmAgent;
 use Throwable;
@@ -25,7 +24,8 @@ final class SendRequestToScout
         $this->logger = $logger;
     }
 
-    public function handle(Request $request, Closure $next) : Response
+    /** @return mixed */
+    public function handle(Request $request, Closure $next)
     {
         $this->agent->connect();
 
