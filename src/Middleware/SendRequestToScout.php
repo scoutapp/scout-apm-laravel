@@ -24,6 +24,7 @@ final class SendRequestToScout
         $this->logger = $logger;
     }
 
+    /** @return mixed */
     public function handle(Request $request, Closure $next)
     {
         $this->agent->connect();

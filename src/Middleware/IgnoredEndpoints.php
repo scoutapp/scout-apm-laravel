@@ -18,6 +18,7 @@ final class IgnoredEndpoints
         $this->agent = $agent;
     }
 
+    /** @return mixed */
     public function handle(Request $request, Closure $next)
     {
         // Check if the request path we're handling is configured to be

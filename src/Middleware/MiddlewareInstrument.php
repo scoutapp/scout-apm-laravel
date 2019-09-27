@@ -23,6 +23,7 @@ final class MiddlewareInstrument
         $this->logger = $logger;
     }
 
+    /** @return mixed */
     public function handle(Request $request, Closure $next)
     {
         $this->logger->debug('[Scout] Handle MiddlewareInstrument');
@@ -30,6 +31,7 @@ final class MiddlewareInstrument
         return $this->agent->instrument(
             'Middleware',
             'all',
+            /** @return mixed */
             static function () use ($request, $next) {
                 return $next($request);
             }

@@ -31,13 +31,18 @@ final class ActionInstrument
         $this->router = $router;
     }
 
-    /** @throws Throwable */
+    /**
+     * @return mixed
+     *
+     * @throws Throwable
+     */
     public function handle(Request $request, Closure $next)
     {
         $this->logger->debug('[Scout] Handle ActionInstrument');
 
         return $this->agent->webTransaction(
             'unknown',
+            /** @return mixed */
             function (Span $span) use ($request, $next) {
                 $response = $next($request);
 
