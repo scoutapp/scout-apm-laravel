@@ -6,6 +6,11 @@
 
 ### Fixed
 
+## [0.2.3] 2019-10-07
+
+### Fixed
+
+* Type mismatch in JsonResponse Middlewares (#21)
 
 ## [0.2.2] 2019-09-26
 
