@@ -8,8 +8,8 @@ use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Route;
 use Illuminate\Routing\Router;
-use Psr\Log\LoggerInterface;
 use Scoutapm\Events\Span\Span;
+use Scoutapm\Logger\FilteredLogLevelDecorator;
 use Scoutapm\ScoutApmAgent;
 use Throwable;
 
@@ -18,13 +18,13 @@ final class ActionInstrument
     /** @var ScoutApmAgent */
     private $agent;
 
-    /** @var LoggerInterface */
+    /** @var FilteredLogLevelDecorator */
     private $logger;
 
     /** @var Router */
     private $router;
 
-    public function __construct(ScoutApmAgent $agent, LoggerInterface $logger, Router $router)
+    public function __construct(ScoutApmAgent $agent, FilteredLogLevelDecorator $logger, Router $router)
     {
         $this->agent  = $agent;
         $this->logger = $logger;

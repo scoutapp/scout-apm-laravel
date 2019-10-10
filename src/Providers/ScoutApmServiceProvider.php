@@ -14,28 +14,42 @@ use Illuminate\Database\Events\QueryExecuted;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\View\Engines\EngineResolver;
 use Illuminate\View\Factory as ViewFactory;
-use Psr\Log\LoggerInterface;
 use Scoutapm\Agent;
 use Scoutapm\Config;
+use Scoutapm\Config\ConfigKey;
 use Scoutapm\Laravel\Database\QueryListener;
 use Scoutapm\Laravel\Middleware\ActionInstrument;
 use Scoutapm\Laravel\Middleware\IgnoredEndpoints;
 use Scoutapm\Laravel\Middleware\MiddlewareInstrument;
 use Scoutapm\Laravel\Middleware\SendRequestToScout;
 use Scoutapm\Laravel\View\Engine\ScoutViewEngineDecorator;
+use Scoutapm\Logger\FilteredLogLevelDecorator;
 use Scoutapm\ScoutApmAgent;
 
 final class ScoutApmServiceProvider extends ServiceProvider
 {
+    private const CONFIG_SERVICE_KEY = ScoutApmAgent::class . '_config';
+
     private const VIEW_ENGINES_TO_WRAP = ['file', 'php', 'blade'];
 
     /** @throws BindingResolutionException */
     public function register() : void
     {
+        $this->app->singleton(self::CONFIG_SERVICE_KEY, static function () {
+            return new Config();
+        });
+
+        $this->app->singleton(FilteredLogLevelDecorator::class, static function (Application $app) {
+            return new FilteredLogLevelDecorator(
+                $app->make('log'),
+                $app->make(self::CONFIG_SERVICE_KEY)->get(ConfigKey::LOG_LEVEL)
+            );
+        });
+
         $this->app->singleton(ScoutApmAgent::class, static function (Application $app) {
             return Agent::fromConfig(
-                new Config(),
-                $app->make('log')
+                $app->make(self::CONFIG_SERVICE_KEY),
+                $app->make(FilteredLogLevelDecorator::class)
             );
         });
 
@@ -69,7 +83,7 @@ final class ScoutApmServiceProvider extends ServiceProvider
     }
 
     /** @param \Illuminate\Foundation\Http\Kernel $kernel */
-    public function boot(Kernel $kernel, ScoutApmAgent $agent, LoggerInterface $log, Connection $connection) : void
+    public function boot(Kernel $kernel, ScoutApmAgent $agent, FilteredLogLevelDecorator $log, Connection $connection) : void
     {
         $log->debug('[Scout] Agent is starting');
 
