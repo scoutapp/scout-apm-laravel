@@ -38,7 +38,7 @@ final class ActionInstrument
      */
     public function handle(Request $request, Closure $next)
     {
-        $this->logger->debug('[Scout] Handle ActionInstrument');
+        $this->logger->debug('Handle ActionInstrument');
 
         return $this->agent->webTransaction(
             'unknown',
@@ -69,7 +69,7 @@ final class ActionInstrument
             }
         } catch (Throwable $e) {
             $this->logger->debug(
-                '[Scout] Exception obtaining name of endpoint: ' . $e->getMessage(),
+                'Exception obtaining name of endpoint: ' . $e->getMessage(),
                 ['exception' => $e]
             );
         }
