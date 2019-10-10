@@ -19,7 +19,7 @@
         "illuminate/view": "^5.5.0|^6.0",
         "ramsey/uuid": "^3.0",
         "psr/log": "^1.0",
-        "scoutapp/scout-apm-php": "^0.2.2"
+        "scoutapp/scout-apm-php": "dev-master"
     },
     "require-dev": {
         "doctrine/coding-standard": "^6.0",
