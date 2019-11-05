@@ -10,7 +10,9 @@ use PHPUnit\Framework\Constraint\IsType;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
+use Psr\Log\LogLevel;
 use Scoutapm\Laravel\Middleware\MiddlewareInstrument;
+use Scoutapm\Logger\FilteredLogLevelDecorator;
 use Scoutapm\ScoutApmAgent;
 
 /** @covers \Scoutapm\Laravel\Middleware\MiddlewareInstrument */
@@ -32,7 +34,10 @@ final class MiddlewareInstrumentTest extends TestCase
         $this->agent  = $this->createMock(ScoutApmAgent::class);
         $this->logger = $this->createMock(LoggerInterface::class);
 
-        $this->middleware = new MiddlewareInstrument($this->agent, $this->logger);
+        $this->middleware = new MiddlewareInstrument(
+            $this->agent,
+            new FilteredLogLevelDecorator($this->logger, LogLevel::DEBUG)
+        );
     }
 
     public function testHandleWrappsMiddlewareExecutionInInstrumentation() : void
@@ -48,8 +53,8 @@ final class MiddlewareInstrumentTest extends TestCase
             });
 
         $this->logger->expects(self::once())
-            ->method('debug')
-            ->with('[Scout] Handle MiddlewareInstrument');
+            ->method('log')
+            ->with(LogLevel::DEBUG, '[Scout] Handle MiddlewareInstrument');
 
         self::assertSame(
             $expectedResponse,

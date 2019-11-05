@@ -18,6 +18,7 @@ use PHPUnit\Framework\Constraint\IsType;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
+use Psr\Log\LogLevel;
 use Scoutapm\Agent;
 use Scoutapm\Laravel\Middleware\ActionInstrument;
 use Scoutapm\Laravel\Middleware\IgnoredEndpoints;
@@ -25,6 +26,7 @@ use Scoutapm\Laravel\Middleware\MiddlewareInstrument;
 use Scoutapm\Laravel\Middleware\SendRequestToScout;
 use Scoutapm\Laravel\Providers\ScoutApmServiceProvider;
 use Scoutapm\Laravel\View\Engine\ScoutViewEngineDecorator;
+use Scoutapm\Logger\FilteredLogLevelDecorator;
 use Scoutapm\ScoutApmAgent;
 use Throwable;
 use function sprintf;
@@ -153,7 +155,7 @@ final class ScoutApmServiceProviderTest extends TestCase
 
     private function bootServiceProvider() : void
     {
-        $log = $this->application->make(LoggerInterface::class);
+        $log = $this->application->make(FilteredLogLevelDecorator::class);
         $this->serviceProvider->boot(
             $this->application->make(Kernel::class),
             $this->application->make(ScoutApmAgent::class),
@@ -177,6 +179,16 @@ final class ScoutApmServiceProviderTest extends TestCase
             }
         );
         $application->alias(LoggerInterface::class, 'log');
+
+        $application->singleton(
+            FilteredLogLevelDecorator::class,
+            static function () use ($application) : FilteredLogLevelDecorator {
+                return new FilteredLogLevelDecorator(
+                    $application->make(LoggerInterface::class),
+                    LogLevel::DEBUG
+                );
+            }
+        );
 
         $application->singleton(
             Kernel::class,
