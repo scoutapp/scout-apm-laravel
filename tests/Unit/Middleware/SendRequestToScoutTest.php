@@ -10,7 +10,9 @@ use Illuminate\Http\Response;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
+use Psr\Log\LogLevel;
 use Scoutapm\Laravel\Middleware\SendRequestToScout;
+use Scoutapm\Logger\FilteredLogLevelDecorator;
 use Scoutapm\ScoutApmAgent;
 
 /** @covers \Scoutapm\Laravel\Middleware\SendRequestToScout */
@@ -32,7 +34,10 @@ final class SendRequestToScoutTest extends TestCase
         $this->agent  = $this->createMock(ScoutApmAgent::class);
         $this->logger = $this->createMock(LoggerInterface::class);
 
-        $this->middleware = new SendRequestToScout($this->agent, $this->logger);
+        $this->middleware = new SendRequestToScout(
+            $this->agent,
+            new FilteredLogLevelDecorator($this->logger, LogLevel::DEBUG)
+        );
     }
 
     public function testHandleSendsRequestToScout() : void
@@ -43,8 +48,8 @@ final class SendRequestToScoutTest extends TestCase
             ->method('send');
 
         $this->logger->expects(self::once())
-            ->method('debug')
-            ->with('[Scout] SendRequestToScout succeeded');
+            ->method('log')
+            ->with(LogLevel::DEBUG, '[Scout] SendRequestToScout succeeded');
 
         self::assertSame(
             $expectedResponse,
@@ -66,8 +71,8 @@ final class SendRequestToScoutTest extends TestCase
             ->willThrowException(new Exception('oh no'));
 
         $this->logger->expects(self::once())
-            ->method('debug')
-            ->with('[Scout] SendRequestToScout failed: oh no');
+            ->method('log')
+            ->with(LogLevel::DEBUG, '[Scout] SendRequestToScout failed: oh no');
 
         self::assertSame(
             $expectedResponse,

@@ -6,7 +6,7 @@ namespace Scoutapm\Laravel\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
-use Psr\Log\LoggerInterface;
+use Scoutapm\Logger\FilteredLogLevelDecorator;
 use Scoutapm\ScoutApmAgent;
 
 final class MiddlewareInstrument
@@ -14,10 +14,10 @@ final class MiddlewareInstrument
     /** @var ScoutApmAgent */
     private $agent;
 
-    /** @var LoggerInterface */
+    /** @var FilteredLogLevelDecorator */
     private $logger;
 
-    public function __construct(ScoutApmAgent $agent, LoggerInterface $logger)
+    public function __construct(ScoutApmAgent $agent, FilteredLogLevelDecorator $logger)
     {
         $this->agent  = $agent;
         $this->logger = $logger;
@@ -26,7 +26,7 @@ final class MiddlewareInstrument
     /** @return mixed */
     public function handle(Request $request, Closure $next)
     {
-        $this->logger->debug('[Scout] Handle MiddlewareInstrument');
+        $this->logger->debug('Handle MiddlewareInstrument');
 
         return $this->agent->instrument(
             'Middleware',

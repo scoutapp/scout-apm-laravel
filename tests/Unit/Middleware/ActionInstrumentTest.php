@@ -13,8 +13,10 @@ use PHPUnit\Framework\Constraint\IsType;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
+use Psr\Log\LogLevel;
 use Scoutapm\Events\Span\Span;
 use Scoutapm\Laravel\Middleware\ActionInstrument;
+use Scoutapm\Logger\FilteredLogLevelDecorator;
 use Scoutapm\ScoutApmAgent;
 use Throwable;
 use function uniqid;
@@ -46,7 +48,11 @@ final class ActionInstrumentTest extends TestCase
         $this->router = $this->createMock(Router::class);
         $this->span   = $this->createMock(Span::class);
 
-        $this->middleware = new ActionInstrument($this->agent, $this->logger, $this->router);
+        $this->middleware = new ActionInstrument(
+            $this->agent,
+            new FilteredLogLevelDecorator($this->logger, LogLevel::DEBUG),
+            $this->router
+        );
 
         $this->agent
             ->expects(self::once())
@@ -73,8 +79,8 @@ final class ActionInstrumentTest extends TestCase
             ->with('Controller/' . $controllerName);
 
         $this->logger->expects(self::once())
-            ->method('debug')
-            ->with('[Scout] Handle ActionInstrument');
+            ->method('log')
+            ->with(LogLevel::DEBUG, '[Scout] Handle ActionInstrument');
 
         self::assertSame(
             $expectedResponse,
@@ -103,8 +109,8 @@ final class ActionInstrumentTest extends TestCase
             ->with('Controller/' . $url);
 
         $this->logger->expects(self::once())
-            ->method('debug')
-            ->with('[Scout] Handle ActionInstrument');
+            ->method('log')
+            ->with(LogLevel::DEBUG, '[Scout] Handle ActionInstrument');
 
         self::assertSame(
             $expectedResponse,
@@ -131,8 +137,8 @@ final class ActionInstrumentTest extends TestCase
             ->with('Controller/unknown');
 
         $this->logger->expects(self::once())
-            ->method('debug')
-            ->with('[Scout] Handle ActionInstrument');
+            ->method('log')
+            ->with(LogLevel::DEBUG, '[Scout] Handle ActionInstrument');
 
         self::assertSame(
             $expectedResponse,
@@ -159,11 +165,14 @@ final class ActionInstrumentTest extends TestCase
             ->with('Controller/unknown');
 
         $this->logger->expects(self::exactly(2))
-            ->method('debug')
-            ->with(self::logicalOr(
-                '[Scout] Handle ActionInstrument',
-                '[Scout] Exception obtaining name of endpoint: oh no'
-            ));
+            ->method('log')
+            ->with(
+                LogLevel::DEBUG,
+                self::logicalOr(
+                    '[Scout] Handle ActionInstrument',
+                    '[Scout] Exception obtaining name of endpoint: oh no'
+                )
+            );
 
         self::assertSame(
             $expectedResponse,
