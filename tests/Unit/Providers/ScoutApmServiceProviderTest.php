@@ -91,9 +91,7 @@ final class ScoutApmServiceProviderTest extends TestCase
                 'cache' => [
                     'default' => 'array',
                     'stores' => [
-                        'array' => [
-                            'driver' => 'array',
-                        ],
+                        'array' => ['driver' => 'array'],
                     ],
                 ],
             ]);

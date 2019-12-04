@@ -15,7 +15,6 @@ use Illuminate\Database\Events\QueryExecuted;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\View\Engines\EngineResolver;
 use Illuminate\View\Factory as ViewFactory;
-use Psr\SimpleCache\CacheInterface;
 use Scoutapm\Agent;
 use Scoutapm\Config;
 use Scoutapm\Config\ConfigKey;
@@ -27,11 +26,12 @@ use Scoutapm\Laravel\Middleware\SendRequestToScout;
 use Scoutapm\Laravel\View\Engine\ScoutViewEngineDecorator;
 use Scoutapm\Logger\FilteredLogLevelDecorator;
 use Scoutapm\ScoutApmAgent;
+use Throwable;
 
 final class ScoutApmServiceProvider extends ServiceProvider
 {
     private const CONFIG_SERVICE_KEY = ScoutApmAgent::class . '_config';
-    private const CACHE_SERVICE_KEY = ScoutApmAgent::class . '_cache';
+    private const CACHE_SERVICE_KEY  = ScoutApmAgent::class . '_cache';
 
     private const VIEW_ENGINES_TO_WRAP = ['file', 'php', 'blade'];
 
@@ -45,7 +45,7 @@ final class ScoutApmServiceProvider extends ServiceProvider
         $this->app->singleton(self::CACHE_SERVICE_KEY, static function (Application $app) {
             try {
                 return $app->make(CacheManager::class)->store();
-            } catch (\Throwable $anything) {
+            } catch (Throwable $anything) {
                 return null;
             }
         });
