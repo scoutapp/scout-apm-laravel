@@ -2,9 +2,13 @@
 
 ## Pending
 
-### Added
+## [1.0.0] 2019-12-04
 
-### Fixed
+### Changed
+
+* Required `scoutapp/scout-apm-php` at `^2.0`
+* Use Laravel's Cache, if configured, for the agent to cache metadata
+* Removed duplicate `[Scout]` text from log messages
 
 ## [0.2.3] 2019-10-07
 
