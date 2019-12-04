@@ -43,13 +43,11 @@ final class ScoutApmServiceProvider extends ServiceProvider
         });
 
         $this->app->singleton(self::CACHE_SERVICE_KEY, static function (Application $app) {
-            $defaultCache = $app->make(CacheManager::class)->store();
-
-            if (!$defaultCache instanceof CacheInterface) {
+            try {
+                return $app->make(CacheManager::class)->store();
+            } catch (\Throwable $anything) {
                 return null;
             }
-
-            return $defaultCache;
         });
 
         $this->app->singleton(FilteredLogLevelDecorator::class, static function (Application $app) {

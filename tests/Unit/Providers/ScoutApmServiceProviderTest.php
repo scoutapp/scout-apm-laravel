@@ -27,6 +27,7 @@ use Psr\Log\LogLevel;
 use ReflectionException;
 use ReflectionProperty;
 use Scoutapm\Agent;
+use Scoutapm\Cache\DevNullCache;
 use Scoutapm\Laravel\Middleware\ActionInstrument;
 use Scoutapm\Laravel\Middleware\IgnoredEndpoints;
 use Scoutapm\Laravel\Middleware\MiddlewareInstrument;
@@ -74,15 +75,30 @@ final class ScoutApmServiceProviderTest extends TestCase
 
         self::assertTrue($this->application->has(ScoutApmAgent::class));
 
-        self::assertInstanceOf(ScoutApmAgent::class, $this->application->make(ScoutApmAgent::class));
+        $agent = $this->application->make(ScoutApmAgent::class);
+
+        self::assertInstanceOf(ScoutApmAgent::class, $agent);
     }
 
     /**
      * @throws BindingResolutionException
      * @throws ReflectionException
      */
-    public function testScoutAgentUsesLaravelConfiguredCache() : void
+    public function testScoutAgentUsesLaravelCacheWhenConfigured() : void
     {
+        $this->application->singleton('config', static function () {
+            return new ConfigRepository([
+                'cache' => [
+                    'default' => 'array',
+                    'stores' => [
+                        'array' => [
+                            'driver' => 'array',
+                        ],
+                    ],
+                ],
+            ]);
+        });
+
         $this->serviceProvider->register();
         $agent = $this->application->make(ScoutApmAgent::class);
 
@@ -92,6 +108,22 @@ final class ScoutApmServiceProviderTest extends TestCase
 
         self::assertInstanceOf(CacheRepository::class, $cacheUsed);
         self::assertInstanceOf(ArrayStore::class, $cacheUsed->getStore());
+    }
+
+    /**
+     * @throws BindingResolutionException
+     * @throws ReflectionException
+     */
+    public function testScoutAgentUsesDevNullCacheWhenNoCacheIsConfigured() : void
+    {
+        $this->serviceProvider->register();
+        $agent = $this->application->make(ScoutApmAgent::class);
+
+        $cacheProperty = new ReflectionProperty($agent, 'cache');
+        $cacheProperty->setAccessible(true);
+        $cacheUsed = $cacheProperty->getValue($agent);
+
+        self::assertInstanceOf(DevNullCache::class, $cacheUsed);
     }
 
     /** @throws Throwable */
@@ -272,19 +304,6 @@ final class ScoutApmServiceProviderTest extends TestCase
                 return new CacheManager($application);
             }
         );
-
-        $application->singleton('config', static function () {
-            return new ConfigRepository([
-                'cache' => [
-                    'default' => 'array',
-                    'stores' => [
-                        'array' => [
-                            'driver' => 'array',
-                        ],
-                    ],
-                ],
-            ]);
-        });
 
         return $application;
     }
