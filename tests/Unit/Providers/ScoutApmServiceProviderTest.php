@@ -5,6 +5,11 @@ declare(strict_types=1);
 namespace Scoutapm\Laravel\UnitTests\Providers;
 
 use Closure;
+use Illuminate\Cache\ArrayStore;
+use Illuminate\Cache\CacheManager;
+use Illuminate\Cache\Repository as CacheRepository;
+use Illuminate\Config\Repository as ConfigRepository;
+use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Contracts\Http\Kernel;
 use Illuminate\Contracts\View\Engine;
 use Illuminate\Contracts\View\View;
@@ -19,6 +24,8 @@ use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
+use ReflectionException;
+use ReflectionProperty;
 use Scoutapm\Agent;
 use Scoutapm\Laravel\Middleware\ActionInstrument;
 use Scoutapm\Laravel\Middleware\IgnoredEndpoints;
@@ -58,7 +65,7 @@ final class ScoutApmServiceProviderTest extends TestCase
         $this->serviceProvider = new ScoutApmServiceProvider($this->application);
     }
 
-    /** @throws Throwable */
+    /** @throws BindingResolutionException */
     public function testScoutAgentIsRegistered() : void
     {
         self::assertFalse($this->application->has(ScoutApmAgent::class));
@@ -66,6 +73,25 @@ final class ScoutApmServiceProviderTest extends TestCase
         $this->serviceProvider->register();
 
         self::assertTrue($this->application->has(ScoutApmAgent::class));
+
+        self::assertInstanceOf(ScoutApmAgent::class, $this->application->make(ScoutApmAgent::class));
+    }
+
+    /**
+     * @throws BindingResolutionException
+     * @throws ReflectionException
+     */
+    public function testScoutAgentUsesLaravelConfiguredCache() : void
+    {
+        $this->serviceProvider->register();
+        $agent = $this->application->make(ScoutApmAgent::class);
+
+        $cacheProperty = new ReflectionProperty($agent, 'cache');
+        $cacheProperty->setAccessible(true);
+        $cacheUsed = $cacheProperty->getValue($agent);
+
+        self::assertInstanceOf(CacheRepository::class, $cacheUsed);
+        self::assertInstanceOf(ArrayStore::class, $cacheUsed->getStore());
     }
 
     /** @throws Throwable */
@@ -239,6 +265,26 @@ final class ScoutApmServiceProviderTest extends TestCase
                 return $viewEngineResolver;
             }
         );
+
+        $application->singleton(
+            'cache',
+            static function () use ($application) : CacheManager {
+                return new CacheManager($application);
+            }
+        );
+
+        $application->singleton('config', static function () {
+            return new ConfigRepository([
+                'cache' => [
+                    'default' => 'array',
+                    'stores' => [
+                        'array' => [
+                            'driver' => 'array',
+                        ],
+                    ],
+                ],
+            ]);
+        });
 
         return $application;
     }

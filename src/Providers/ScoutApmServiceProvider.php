@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Scoutapm\Laravel\Providers;
 
+use Illuminate\Cache\CacheManager;
 use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\Http\Kernel;
@@ -14,6 +15,7 @@ use Illuminate\Database\Events\QueryExecuted;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\View\Engines\EngineResolver;
 use Illuminate\View\Factory as ViewFactory;
+use Psr\SimpleCache\CacheInterface;
 use Scoutapm\Agent;
 use Scoutapm\Config;
 use Scoutapm\Config\ConfigKey;
@@ -29,6 +31,7 @@ use Scoutapm\ScoutApmAgent;
 final class ScoutApmServiceProvider extends ServiceProvider
 {
     private const CONFIG_SERVICE_KEY = ScoutApmAgent::class . '_config';
+    private const CACHE_SERVICE_KEY = ScoutApmAgent::class . '_cache';
 
     private const VIEW_ENGINES_TO_WRAP = ['file', 'php', 'blade'];
 
@@ -37,6 +40,16 @@ final class ScoutApmServiceProvider extends ServiceProvider
     {
         $this->app->singleton(self::CONFIG_SERVICE_KEY, static function () {
             return new Config();
+        });
+
+        $this->app->singleton(self::CACHE_SERVICE_KEY, static function (Application $app) {
+            $defaultCache = $app->make(CacheManager::class)->store();
+
+            if (!$defaultCache instanceof CacheInterface) {
+                return null;
+            }
+
+            return $defaultCache;
         });
 
         $this->app->singleton(FilteredLogLevelDecorator::class, static function (Application $app) {
@@ -49,7 +62,8 @@ final class ScoutApmServiceProvider extends ServiceProvider
         $this->app->singleton(ScoutApmAgent::class, static function (Application $app) {
             return Agent::fromConfig(
                 $app->make(self::CONFIG_SERVICE_KEY),
-                $app->make(FilteredLogLevelDecorator::class)
+                $app->make(FilteredLogLevelDecorator::class),
+                $app->make(self::CACHE_SERVICE_KEY)
             );
         });
 
