@@ -8,10 +8,12 @@ use Illuminate\Contracts\View\Engine;
 
 class EngineImplementationWithGetCompilerMethod implements Engine
 {
+    /** @inheritDoc */
     public function get($path, array $data = [])
     {
     }
 
+    /** @inheritDoc */
     public function getCompiler()
     {
     }
