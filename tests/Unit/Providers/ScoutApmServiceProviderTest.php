@@ -162,18 +162,15 @@ final class ScoutApmServiceProviderTest extends TestCase
 
         /** @var Agent $agent */
         $agent = $this->application->make(ScoutApmAgent::class);
-        self::assertArraySubset(
-            [
-                'BatchCommand' => [
-                    'commands' => [
-                        1 => [
-                            'StartSpan' => ['operation' => 'View/' . $templateName],
-                        ],
-                    ],
-                ],
-            ],
-            $agent->getRequest()->jsonSerialize()
-        );
+
+        $commands = $agent->getRequest()->jsonSerialize()['BatchCommand']['commands'];
+
+        self::assertCount(4, $commands);
+
+        self::assertArrayHasKey(1, $commands);
+        self::assertArrayHasKey('StartSpan', $commands[1]);
+        self::assertArrayHasKey('operation', $commands[1]['StartSpan']);
+        self::assertSame('View/' . $templateName, $commands[1]['StartSpan']['operation']);
     }
 
     /** @throws Throwable */
