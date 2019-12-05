@@ -4,6 +4,7 @@ php:
   - 7.1
   - 7.2
   - 7.3
+  - 7.4
 
 env:
   - DEPENDENCIES="--prefer-lowest --prefer-stable"
@@ -20,12 +21,12 @@ script:
 jobs:
   include:
     - stage: Check coding standards
-      php: 7.3
+      php: 7.4
       env: DEPENDENCIES="" PHP=""
       script: vendor/bin/phpcs
 
     - stage: Run static analysis check
-      php: 7.3
+      php: 7.4
       env: DEPENDENCIES="" PHP=""
       script: vendor/bin/psalm
 
