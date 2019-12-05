@@ -34,7 +34,7 @@ final class ScoutViewEngineDecoratorTest extends TestCase
         parent::setUp();
 
         // Note: getCompiler is NOT a real method, it is implemented by the real implementation only, SOLID violation in Laravel
-        $this->realEngine  = $this->createPartialMock(Engine::class, ['get', 'getCompiler']);
+        $this->realEngine  = $this->createMock(EngineImplementationWithGetCompilerMethod::class);
         $this->agent       = $this->createMock(ScoutApmAgent::class);
         $this->viewFactory = $this->createMock(ViewFactory::class);
 
@@ -102,7 +102,7 @@ final class ScoutViewEngineDecoratorTest extends TestCase
 
         $this->realEngine->expects(self::once())
             ->method('getCompiler')
-            ->wilLReturn($compiler);
+            ->willReturn($compiler);
 
         self::assertSame($compiler, $this->viewEngineDecorator->getCompiler());
     }
