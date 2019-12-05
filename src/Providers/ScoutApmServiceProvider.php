@@ -39,7 +39,7 @@ final class ScoutApmServiceProvider extends ServiceProvider
     public function register() : void
     {
         $this->app->singleton(self::CONFIG_SERVICE_KEY, static function () {
-            return new Config();
+            return Config::fromArray([]);
         });
 
         $this->app->singleton(self::CACHE_SERVICE_KEY, static function (Application $app) {
