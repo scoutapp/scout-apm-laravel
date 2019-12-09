@@ -17,7 +17,13 @@ A Scout account is required. [Signup for Scout](https://scoutapm.com/users/sign_
 ```bash
 composer require scoutapp/scout-apm-laravel
 ```
-    
+
+Then use Laravel's `artisan vendor:publish` to ensure configuration can be cached:
+
+```bash
+php artisan vendor:publish --provider="Scoutapm\Laravel\Providers\ScoutApmServiceProvider"
+```
+
 ### Configuration
 
 In your `.env` file, make sure you set a few configuration variables:

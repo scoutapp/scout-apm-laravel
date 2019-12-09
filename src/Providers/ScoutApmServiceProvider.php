@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Scoutapm\Laravel\Providers;
 
 use Illuminate\Cache\CacheManager;
+use Illuminate\Contracts\Config\Repository as ConfigRepository;
 use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\Http\Kernel;
@@ -38,8 +39,18 @@ final class ScoutApmServiceProvider extends ServiceProvider
     /** @throws BindingResolutionException */
     public function register() : void
     {
-        $this->app->singleton(self::CONFIG_SERVICE_KEY, static function () {
-            return Config::fromArray([]);
+        $this->app->singleton(self::CONFIG_SERVICE_KEY, function () {
+            $configRepo = $this->app->make(ConfigRepository::class);
+
+            return Config::fromArray(array_filter(array_combine(
+                ConfigKey::allConfigurationKeys(),
+                array_map(
+                    static function ($configurationKey) use ($configRepo) {
+                        return $configRepo->get('scout.' . $configurationKey);
+                    },
+                    ConfigKey::allConfigurationKeys()
+                )
+            )));
         });
 
         $this->app->singleton(self::CACHE_SERVICE_KEY, static function (Application $app) {
@@ -98,6 +109,10 @@ final class ScoutApmServiceProvider extends ServiceProvider
     public function boot(Kernel $kernel, ScoutApmAgent $agent, FilteredLogLevelDecorator $log, Connection $connection) : void
     {
         $log->debug('Agent is starting');
+
+        $this->publishes([
+            __DIR__ . '/../../config/scout.php' => config_path('scout.php')
+        ]);
 
         $this->installInstruments($kernel, $agent, $connection);
     }
