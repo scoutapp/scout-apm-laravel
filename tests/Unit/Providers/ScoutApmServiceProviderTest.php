@@ -300,6 +300,13 @@ final class ScoutApmServiceProviderTest extends TestCase
             }
         );
 
+        $application->singleton(
+            'config',
+            static function () : ConfigRepository {
+                return new ConfigRepository();
+            }
+        );
+
         return $application;
     }
 }
