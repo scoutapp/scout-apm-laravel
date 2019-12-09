@@ -11,7 +11,8 @@ declare(strict_types=1);
 
 use Scoutapm\Config\ConfigKey;
 
-return array_combine(
+/** @noinspection PhpUnnecessaryLocalVariableInspection */
+$config = array_combine(
     ConfigKey::allConfigurationKeys(),
     array_map(
         static function ($configKey) {
@@ -20,3 +21,11 @@ return array_combine(
         ConfigKey::allConfigurationKeys()
     )
 );
+
+/**
+ * If you want to override specific keys that were set in your env (or you don't want to use `.env` to configure), you
+ * can do so here; these will take precedence.
+ */
+// $config['key'] = 'actuallyThisOne';
+
+return $config;
