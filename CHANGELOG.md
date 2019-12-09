@@ -1,6 +1,11 @@
 # Changelog
 
-## Pending
+## Pending [1.1.next]
+
+## [1.1.0] 2019-12-09
+
+* Support for PHP 7.4 (#32)
+* Use Laravel's Config Repository for Scout configuration, so that config can now be cached (#34)
 
 ## [1.0.0] 2019-12-04
 
