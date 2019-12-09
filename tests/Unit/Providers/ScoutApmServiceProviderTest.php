@@ -40,6 +40,7 @@ use Scoutapm\ScoutApmAgent;
 use Throwable;
 use function putenv;
 use function sprintf;
+use function sys_get_temp_dir;
 use function uniqid;
 
 /** @covers \Scoutapm\Laravel\Providers\ScoutApmServiceProvider */
@@ -333,6 +334,14 @@ final class ScoutApmServiceProviderTest extends TestCase
             'cache',
             static function () use ($application) : CacheManager {
                 return new CacheManager($application);
+            }
+        );
+
+        // Older versions of Laravel used `path.config` service name for path...
+        $application->singleton(
+            'path.config',
+            static function () : string {
+                return sys_get_temp_dir();
             }
         );
 
