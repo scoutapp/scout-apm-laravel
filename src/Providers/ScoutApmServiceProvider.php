@@ -28,6 +28,10 @@ use Scoutapm\Laravel\View\Engine\ScoutViewEngineDecorator;
 use Scoutapm\Logger\FilteredLogLevelDecorator;
 use Scoutapm\ScoutApmAgent;
 use Throwable;
+use function array_combine;
+use function array_filter;
+use function array_map;
+use function config_path;
 
 final class ScoutApmServiceProvider extends ServiceProvider
 {
@@ -45,7 +49,8 @@ final class ScoutApmServiceProvider extends ServiceProvider
             return Config::fromArray(array_filter(array_combine(
                 ConfigKey::allConfigurationKeys(),
                 array_map(
-                    static function ($configurationKey) use ($configRepo) {
+                    /** @return mixed */
+                    static function (string $configurationKey) use ($configRepo) {
                         return $configRepo->get('scout.' . $configurationKey);
                     },
                     ConfigKey::allConfigurationKeys()
@@ -111,7 +116,7 @@ final class ScoutApmServiceProvider extends ServiceProvider
         $log->debug('Agent is starting');
 
         $this->publishes([
-            __DIR__ . '/../../config/scout.php' => config_path('scout.php')
+            __DIR__ . '/../../config/scout.php' => config_path('scout.php'),
         ]);
 
         $this->installInstruments($kernel, $agent, $connection);

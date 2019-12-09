@@ -28,6 +28,7 @@ use ReflectionException;
 use ReflectionProperty;
 use Scoutapm\Agent;
 use Scoutapm\Cache\DevNullCache;
+use Scoutapm\Config;
 use Scoutapm\Laravel\Middleware\ActionInstrument;
 use Scoutapm\Laravel\Middleware\IgnoredEndpoints;
 use Scoutapm\Laravel\Middleware\MiddlewareInstrument;
@@ -37,6 +38,7 @@ use Scoutapm\Laravel\View\Engine\ScoutViewEngineDecorator;
 use Scoutapm\Logger\FilteredLogLevelDecorator;
 use Scoutapm\ScoutApmAgent;
 use Throwable;
+use function putenv;
 use function sprintf;
 use function uniqid;
 
@@ -122,6 +124,40 @@ final class ScoutApmServiceProviderTest extends TestCase
         $cacheUsed = $cacheProperty->getValue($agent);
 
         self::assertInstanceOf(DevNullCache::class, $cacheUsed);
+    }
+
+    /**
+     * @throws BindingResolutionException
+     * @throws ReflectionException
+     */
+    public function testScoutAgentPullsConfigFromConfigRepositoryAndEnv() : void
+    {
+        $configName = uniqid('configName', true);
+        $configKey  = uniqid('configKey', true);
+
+        putenv('SCOUT_KEY=' . $configKey);
+
+        $this->application->singleton('config', static function () use ($configName) {
+            return new ConfigRepository([
+                'scout' => [Config\ConfigKey::APPLICATION_NAME => $configName],
+            ]);
+        });
+
+        $this->serviceProvider->register();
+
+        /** @var ScoutApmAgent $agent */
+        $agent = $this->application->make(ScoutApmAgent::class);
+
+        $configProperty = new ReflectionProperty($agent, 'config');
+        $configProperty->setAccessible(true);
+
+        /** @var Config $configUsed */
+        $configUsed = $configProperty->getValue($agent);
+
+        self::assertSame($configName, $configUsed->get(Config\ConfigKey::APPLICATION_NAME));
+        self::assertSame($configKey, $configUsed->get(Config\ConfigKey::APPLICATION_KEY));
+
+        putenv('SCOUT_KEY');
     }
 
     /** @throws Throwable */
