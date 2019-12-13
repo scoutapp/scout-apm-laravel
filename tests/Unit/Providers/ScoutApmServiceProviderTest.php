@@ -10,11 +10,12 @@ use Illuminate\Cache\CacheManager;
 use Illuminate\Cache\Repository as CacheRepository;
 use Illuminate\Config\Repository as ConfigRepository;
 use Illuminate\Contracts\Container\BindingResolutionException;
-use Illuminate\Contracts\Http\Kernel;
+use Illuminate\Contracts\Http\Kernel as HttpKernelInterface;
 use Illuminate\Contracts\View\Engine;
 use Illuminate\Contracts\View\View;
 use Illuminate\Database\Connection;
 use Illuminate\Foundation\Application;
+use Illuminate\Foundation\Http\Kernel as HttpKernelImplementation;
 use Illuminate\Routing\Router;
 use Illuminate\View\Engines\EngineResolver;
 use Illuminate\View\Factory as ViewFactory;
@@ -211,10 +212,10 @@ final class ScoutApmServiceProviderTest extends TestCase
     }
 
     /** @throws Throwable */
-    public function testMiddlewareAreRegisteredOnBoot() : void
+    public function testMiddlewareAreRegisteredOnBootForHttpRequest() : void
     {
-        /** @var \Illuminate\Foundation\Http\Kernel $kernel */
-        $kernel = $this->application->make(Kernel::class);
+        /** @var HttpKernelImplementation $kernel */
+        $kernel = $this->application->make(HttpKernelInterface::class);
 
         $this->serviceProvider->register();
 
@@ -223,12 +224,37 @@ final class ScoutApmServiceProviderTest extends TestCase
         self::assertFalse($kernel->hasMiddleware(IgnoredEndpoints::class));
         self::assertFalse($kernel->hasMiddleware(SendRequestToScout::class));
 
+        $_ENV['APP_RUNNING_IN_CONSOLE'] = false;
         $this->bootServiceProvider();
 
         self::assertTrue($kernel->hasMiddleware(MiddlewareInstrument::class));
         self::assertTrue($kernel->hasMiddleware(ActionInstrument::class));
         self::assertTrue($kernel->hasMiddleware(IgnoredEndpoints::class));
         self::assertTrue($kernel->hasMiddleware(SendRequestToScout::class));
+        unset($_ENV['APP_RUNNING_IN_CONSOLE']);
+    }
+
+    /** @throws Throwable */
+    public function testMiddlewareAreNotRegisteredOnBootForConsoleRequest() : void
+    {
+        /** @var HttpKernelImplementation $kernel */
+        $kernel = $this->application->make(HttpKernelInterface::class);
+
+        $this->serviceProvider->register();
+
+        self::assertFalse($kernel->hasMiddleware(MiddlewareInstrument::class));
+        self::assertFalse($kernel->hasMiddleware(ActionInstrument::class));
+        self::assertFalse($kernel->hasMiddleware(IgnoredEndpoints::class));
+        self::assertFalse($kernel->hasMiddleware(SendRequestToScout::class));
+
+        $_ENV['APP_RUNNING_IN_CONSOLE'] = true;
+        $this->bootServiceProvider();
+
+        self::assertFalse($kernel->hasMiddleware(MiddlewareInstrument::class));
+        self::assertFalse($kernel->hasMiddleware(ActionInstrument::class));
+        self::assertFalse($kernel->hasMiddleware(IgnoredEndpoints::class));
+        self::assertFalse($kernel->hasMiddleware(SendRequestToScout::class));
+        unset($_ENV['APP_RUNNING_IN_CONSOLE']);
     }
 
     /** @throws Throwable */
@@ -243,11 +269,12 @@ final class ScoutApmServiceProviderTest extends TestCase
         $this->bootServiceProvider();
     }
 
+    /** @throws BindingResolutionException */
     private function bootServiceProvider() : void
     {
         $log = $this->application->make(FilteredLogLevelDecorator::class);
         $this->serviceProvider->boot(
-            $this->application->make(Kernel::class),
+            $this->application,
             $this->application->make(ScoutApmAgent::class),
             $log,
             $this->connection
@@ -281,9 +308,9 @@ final class ScoutApmServiceProviderTest extends TestCase
         );
 
         $application->singleton(
-            Kernel::class,
-            function () use ($application) : Kernel {
-                return new \Illuminate\Foundation\Http\Kernel($application, $this->createMock(Router::class));
+            HttpKernelInterface::class,
+            function () use ($application) : HttpKernelInterface {
+                return new HttpKernelImplementation($application, $this->createMock(Router::class));
             }
         );
 
