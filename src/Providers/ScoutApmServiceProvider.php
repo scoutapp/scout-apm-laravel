@@ -119,21 +119,16 @@ final class ScoutApmServiceProvider extends ServiceProvider
             __DIR__ . '/../../config/scout_apm.php' => config_path('scout_apm.php'),
         ]);
 
-        $this->installInstruments($kernel, $agent, $connection);
+        $this->instrumentMiddleware($kernel);
+        $this->instrumentDatabaseQueries($agent, $connection);
     }
 
     /**
-     * This installs all the instruments right here. If/when the laravel specific instruments grow, we should extract
-     * them to a dedicated instrument manager as we add more.
-     *
+     * @noinspection PhpDocSignatureInspection
      * @param \Illuminate\Foundation\Http\Kernel $kernel
      */
-    public function installInstruments(Kernel $kernel, ScoutApmAgent $agent, Connection $connection) : void
+    private function instrumentMiddleware(Kernel $kernel) : void
     {
-        $connection->listen(static function (QueryExecuted $query) use ($agent) : void {
-            (new QueryListener($agent))->__invoke($query);
-        });
-
         $kernel->prependMiddleware(MiddlewareInstrument::class);
         $kernel->pushMiddleware(ActionInstrument::class);
 
@@ -141,5 +136,12 @@ final class ScoutApmServiceProvider extends ServiceProvider
         // the request, and send it to the CoreAgent.
         $kernel->prependMiddleware(IgnoredEndpoints::class);
         $kernel->prependMiddleware(SendRequestToScout::class);
+    }
+
+    private function instrumentDatabaseQueries(ScoutApmAgent $agent, Connection $connection) : void
+    {
+        $connection->listen(static function (QueryExecuted $query) use ($agent) : void {
+            (new QueryListener($agent))->__invoke($query);
+        });
     }
 }
