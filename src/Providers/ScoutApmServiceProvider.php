@@ -7,18 +7,22 @@ namespace Scoutapm\Laravel\Providers;
 use Illuminate\Cache\CacheManager;
 use Illuminate\Contracts\Config\Repository as ConfigRepository;
 use Illuminate\Contracts\Container\BindingResolutionException;
+use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\Http\Kernel;
 use Illuminate\Contracts\View\Engine;
 use Illuminate\Contracts\View\View;
 use Illuminate\Database\Connection;
 use Illuminate\Database\Events\QueryExecuted;
+use Illuminate\Queue\Events\JobProcessed;
+use Illuminate\Queue\Events\JobProcessing;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\View\Engines\EngineResolver;
 use Illuminate\View\Factory as ViewFactory;
 use Scoutapm\Agent;
 use Scoutapm\Config;
 use Scoutapm\Config\ConfigKey;
+use Scoutapm\Events\Span\Span;
 use Scoutapm\Laravel\Database\QueryListener;
 use Scoutapm\Laravel\Middleware\ActionInstrument;
 use Scoutapm\Laravel\Middleware\IgnoredEndpoints;
@@ -121,6 +125,7 @@ final class ScoutApmServiceProvider extends ServiceProvider
 
         $this->instrumentMiddleware($kernel);
         $this->instrumentDatabaseQueries($agent, $connection);
+        $this->instrumentQueues($agent, $kernel->getApplication()->make('events'));
     }
 
     /**
@@ -142,6 +147,23 @@ final class ScoutApmServiceProvider extends ServiceProvider
     {
         $connection->listen(static function (QueryExecuted $query) use ($agent) : void {
             (new QueryListener($agent))->__invoke($query);
+        });
+    }
+
+    private function instrumentQueues(ScoutApmAgent $agent, Dispatcher $eventDispatcher)
+    {
+        $eventDispatcher->listen(JobProcessing::class, static function (JobProcessing $event) use ($agent) {
+            $agent->startSpan(Span::INSTRUMENT_JOB . '/' . class_basename($event->job->resolveName()));
+        });
+
+        $eventDispatcher->listen(JobProcessed::class, static function () use ($agent) {
+            $agent->stopSpan();
+
+            /**
+             * @todo need to work out how to determine if we're "sync" or "async". If "sync" we can leave it to
+             * SendRequestToScout to send the request. If "async" we need to send it after each job.
+             */
+            $agent->send(); // @todo need to clear/reset the request each time we send...
         });
     }
 }
