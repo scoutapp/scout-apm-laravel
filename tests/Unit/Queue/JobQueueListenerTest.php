@@ -55,8 +55,11 @@ final class JobQueueListenerTest extends TestCase
     }
 
     /** @throws Exception */
-    public function testRequestIsSentAndReset() : void
+    public function testAgentConnectsAndSendsWhenRequestIsToBeSent() : void
     {
+        $this->agent->expects(self::once())
+            ->method('connect');
+
         $this->agent->expects(self::once())
             ->method('send');
 
