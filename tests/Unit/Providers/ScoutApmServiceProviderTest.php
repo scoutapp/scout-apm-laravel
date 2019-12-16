@@ -285,7 +285,7 @@ final class ScoutApmServiceProviderTest extends TestCase
      * Helper to create a Laravel application instance that has very basic wiring up of services that our Laravel
      * binding library actually interacts with in some way.
      */
-    private function createLaravelApplicationFulfillingBasicRequirementsForScout($runningInConsole = false) : Application
+    private function createLaravelApplicationFulfillingBasicRequirementsForScout(bool $runningInConsole = false) : Application
     {
         $application = $this->getMockBuilder(Application::class)
             ->setMethods(['runningInConsole'])
