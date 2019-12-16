@@ -61,7 +61,5 @@ final class JobQueueListenerTest extends TestCase
             ->method('send');
 
         $this->jobQueueListener->sendRequestForJob();
-
-        self::markTestIncomplete('Need to figure a way to ensure request has been reset');
     }
 }
