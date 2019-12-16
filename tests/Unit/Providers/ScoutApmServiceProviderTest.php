@@ -51,7 +51,7 @@ final class ScoutApmServiceProviderTest extends TestCase
 
     private const VIEW_ENGINES_TO_WRAP = ['file', 'php', 'blade'];
 
-    /** @var Application */
+    /** @var Application&MockObject */
     private $application;
 
     /** @var ScoutApmServiceProvider */
@@ -224,19 +224,21 @@ final class ScoutApmServiceProviderTest extends TestCase
         self::assertFalse($kernel->hasMiddleware(IgnoredEndpoints::class));
         self::assertFalse($kernel->hasMiddleware(SendRequestToScout::class));
 
-        $_ENV['APP_RUNNING_IN_CONSOLE'] = false;
         $this->bootServiceProvider();
 
         self::assertTrue($kernel->hasMiddleware(MiddlewareInstrument::class));
         self::assertTrue($kernel->hasMiddleware(ActionInstrument::class));
         self::assertTrue($kernel->hasMiddleware(IgnoredEndpoints::class));
         self::assertTrue($kernel->hasMiddleware(SendRequestToScout::class));
-        unset($_ENV['APP_RUNNING_IN_CONSOLE']);
     }
 
     /** @throws Throwable */
     public function testMiddlewareAreNotRegisteredOnBootForConsoleRequest() : void
     {
+        $this->application = $this->createLaravelApplicationFulfillingBasicRequirementsForScout(true);
+
+        $this->serviceProvider = new ScoutApmServiceProvider($this->application);
+
         /** @var HttpKernelImplementation $kernel */
         $kernel = $this->application->make(HttpKernelInterface::class);
 
@@ -247,14 +249,12 @@ final class ScoutApmServiceProviderTest extends TestCase
         self::assertFalse($kernel->hasMiddleware(IgnoredEndpoints::class));
         self::assertFalse($kernel->hasMiddleware(SendRequestToScout::class));
 
-        $_ENV['APP_RUNNING_IN_CONSOLE'] = true;
         $this->bootServiceProvider();
 
         self::assertFalse($kernel->hasMiddleware(MiddlewareInstrument::class));
         self::assertFalse($kernel->hasMiddleware(ActionInstrument::class));
         self::assertFalse($kernel->hasMiddleware(IgnoredEndpoints::class));
         self::assertFalse($kernel->hasMiddleware(SendRequestToScout::class));
-        unset($_ENV['APP_RUNNING_IN_CONSOLE']);
     }
 
     /** @throws Throwable */
@@ -285,9 +285,15 @@ final class ScoutApmServiceProviderTest extends TestCase
      * Helper to create a Laravel application instance that has very basic wiring up of services that our Laravel
      * binding library actually interacts with in some way.
      */
-    private function createLaravelApplicationFulfillingBasicRequirementsForScout() : Application
+    private function createLaravelApplicationFulfillingBasicRequirementsForScout($runningInConsole = false) : Application
     {
-        $application = new Application();
+        $application = $this->getMockBuilder(Application::class)
+            ->setMethods(['runningInConsole'])
+            ->getMock();
+
+        $application
+            ->method('runningInConsole')
+            ->willReturn($runningInConsole);
 
         $application->singleton(
             LoggerInterface::class,
