@@ -41,6 +41,7 @@ final class JobQueueListener
     /** @throws Exception */
     public function sendRequestForJob() : void
     {
+        $this->agent->connect();
         $this->agent->send();
     }
 }
