@@ -10,11 +10,12 @@ use Illuminate\Cache\CacheManager;
 use Illuminate\Cache\Repository as CacheRepository;
 use Illuminate\Config\Repository as ConfigRepository;
 use Illuminate\Contracts\Container\BindingResolutionException;
-use Illuminate\Contracts\Http\Kernel;
+use Illuminate\Contracts\Http\Kernel as HttpKernelInterface;
 use Illuminate\Contracts\View\Engine;
 use Illuminate\Contracts\View\View;
 use Illuminate\Database\Connection;
 use Illuminate\Foundation\Application;
+use Illuminate\Foundation\Http\Kernel as HttpKernelImplementation;
 use Illuminate\Routing\Router;
 use Illuminate\View\Engines\EngineResolver;
 use Illuminate\View\Factory as ViewFactory;
@@ -50,7 +51,7 @@ final class ScoutApmServiceProviderTest extends TestCase
 
     private const VIEW_ENGINES_TO_WRAP = ['file', 'php', 'blade'];
 
-    /** @var Application */
+    /** @var Application&MockObject */
     private $application;
 
     /** @var ScoutApmServiceProvider */
@@ -211,10 +212,10 @@ final class ScoutApmServiceProviderTest extends TestCase
     }
 
     /** @throws Throwable */
-    public function testMiddlewareAreRegisteredOnBoot() : void
+    public function testMiddlewareAreRegisteredOnBootForHttpRequest() : void
     {
-        /** @var \Illuminate\Foundation\Http\Kernel $kernel */
-        $kernel = $this->application->make(Kernel::class);
+        /** @var HttpKernelImplementation $kernel */
+        $kernel = $this->application->make(HttpKernelInterface::class);
 
         $this->serviceProvider->register();
 
@@ -232,6 +233,31 @@ final class ScoutApmServiceProviderTest extends TestCase
     }
 
     /** @throws Throwable */
+    public function testMiddlewareAreNotRegisteredOnBootForConsoleRequest() : void
+    {
+        $this->application = $this->createLaravelApplicationFulfillingBasicRequirementsForScout(true);
+
+        $this->serviceProvider = new ScoutApmServiceProvider($this->application);
+
+        /** @var HttpKernelImplementation $kernel */
+        $kernel = $this->application->make(HttpKernelInterface::class);
+
+        $this->serviceProvider->register();
+
+        self::assertFalse($kernel->hasMiddleware(MiddlewareInstrument::class));
+        self::assertFalse($kernel->hasMiddleware(ActionInstrument::class));
+        self::assertFalse($kernel->hasMiddleware(IgnoredEndpoints::class));
+        self::assertFalse($kernel->hasMiddleware(SendRequestToScout::class));
+
+        $this->bootServiceProvider();
+
+        self::assertFalse($kernel->hasMiddleware(MiddlewareInstrument::class));
+        self::assertFalse($kernel->hasMiddleware(ActionInstrument::class));
+        self::assertFalse($kernel->hasMiddleware(IgnoredEndpoints::class));
+        self::assertFalse($kernel->hasMiddleware(SendRequestToScout::class));
+    }
+
+    /** @throws Throwable */
     public function testDatabaseQueryListenerIsRegistered() : void
     {
         $this->serviceProvider->register();
@@ -243,11 +269,12 @@ final class ScoutApmServiceProviderTest extends TestCase
         $this->bootServiceProvider();
     }
 
+    /** @throws BindingResolutionException */
     private function bootServiceProvider() : void
     {
         $log = $this->application->make(FilteredLogLevelDecorator::class);
         $this->serviceProvider->boot(
-            $this->application->make(Kernel::class),
+            $this->application,
             $this->application->make(ScoutApmAgent::class),
             $log,
             $this->connection
@@ -258,9 +285,15 @@ final class ScoutApmServiceProviderTest extends TestCase
      * Helper to create a Laravel application instance that has very basic wiring up of services that our Laravel
      * binding library actually interacts with in some way.
      */
-    private function createLaravelApplicationFulfillingBasicRequirementsForScout() : Application
+    private function createLaravelApplicationFulfillingBasicRequirementsForScout(bool $runningInConsole = false) : Application
     {
-        $application = new Application();
+        $application = $this->getMockBuilder(Application::class)
+            ->setMethods(['runningInConsole'])
+            ->getMock();
+
+        $application
+            ->method('runningInConsole')
+            ->willReturn($runningInConsole);
 
         $application->singleton(
             LoggerInterface::class,
@@ -281,9 +314,9 @@ final class ScoutApmServiceProviderTest extends TestCase
         );
 
         $application->singleton(
-            Kernel::class,
-            function () use ($application) : Kernel {
-                return new \Illuminate\Foundation\Http\Kernel($application, $this->createMock(Router::class));
+            HttpKernelInterface::class,
+            function () use ($application) : HttpKernelInterface {
+                return new HttpKernelImplementation($application, $this->createMock(Router::class));
             }
         );
 

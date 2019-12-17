@@ -7,12 +7,16 @@ namespace Scoutapm\Laravel\Providers;
 use Illuminate\Cache\CacheManager;
 use Illuminate\Contracts\Config\Repository as ConfigRepository;
 use Illuminate\Contracts\Container\BindingResolutionException;
+use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Foundation\Application;
-use Illuminate\Contracts\Http\Kernel;
+use Illuminate\Contracts\Http\Kernel as HttpKernelInterface;
 use Illuminate\Contracts\View\Engine;
 use Illuminate\Contracts\View\View;
 use Illuminate\Database\Connection;
 use Illuminate\Database\Events\QueryExecuted;
+use Illuminate\Foundation\Http\Kernel as HttpKernelImplementation;
+use Illuminate\Queue\Events\JobProcessed;
+use Illuminate\Queue\Events\JobProcessing;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\View\Engines\EngineResolver;
 use Illuminate\View\Factory as ViewFactory;
@@ -24,6 +28,7 @@ use Scoutapm\Laravel\Middleware\ActionInstrument;
 use Scoutapm\Laravel\Middleware\IgnoredEndpoints;
 use Scoutapm\Laravel\Middleware\MiddlewareInstrument;
 use Scoutapm\Laravel\Middleware\SendRequestToScout;
+use Scoutapm\Laravel\Queue\JobQueueListener;
 use Scoutapm\Laravel\View\Engine\ScoutViewEngineDecorator;
 use Scoutapm\Logger\FilteredLogLevelDecorator;
 use Scoutapm\ScoutApmAgent;
@@ -110,30 +115,39 @@ final class ScoutApmServiceProvider extends ServiceProvider
         );
     }
 
-    /** @param \Illuminate\Foundation\Http\Kernel $kernel */
-    public function boot(Kernel $kernel, ScoutApmAgent $agent, FilteredLogLevelDecorator $log, Connection $connection) : void
-    {
+    /** @throws BindingResolutionException */
+    public function boot(
+        Application $application,
+        ScoutApmAgent $agent,
+        FilteredLogLevelDecorator $log,
+        Connection $connection
+    ) : void {
         $log->debug('Agent is starting');
 
         $this->publishes([
             __DIR__ . '/../../config/scout_apm.php' => config_path('scout_apm.php'),
         ]);
 
-        $this->installInstruments($kernel, $agent, $connection);
+        $runningInConsole = $application->runningInConsole();
+
+        $this->instrumentDatabaseQueries($agent, $connection);
+        $this->instrumentQueues($agent, $application->make('events'), $runningInConsole);
+
+        if ($runningInConsole) {
+            return;
+        }
+
+        $httpKernel = $application->make(HttpKernelInterface::class);
+        $this->instrumentMiddleware($httpKernel);
     }
 
     /**
-     * This installs all the instruments right here. If/when the laravel specific instruments grow, we should extract
-     * them to a dedicated instrument manager as we add more.
+     * @param HttpKernelImplementation $kernel
      *
-     * @param \Illuminate\Foundation\Http\Kernel $kernel
+     * @noinspection PhpDocSignatureInspection
      */
-    public function installInstruments(Kernel $kernel, ScoutApmAgent $agent, Connection $connection) : void
+    private function instrumentMiddleware(HttpKernelInterface $kernel) : void
     {
-        $connection->listen(static function (QueryExecuted $query) use ($agent) : void {
-            (new QueryListener($agent))->__invoke($query);
-        });
-
         $kernel->prependMiddleware(MiddlewareInstrument::class);
         $kernel->pushMiddleware(ActionInstrument::class);
 
@@ -141,5 +155,31 @@ final class ScoutApmServiceProvider extends ServiceProvider
         // the request, and send it to the CoreAgent.
         $kernel->prependMiddleware(IgnoredEndpoints::class);
         $kernel->prependMiddleware(SendRequestToScout::class);
+    }
+
+    private function instrumentDatabaseQueries(ScoutApmAgent $agent, Connection $connection) : void
+    {
+        $connection->listen(static function (QueryExecuted $query) use ($agent) : void {
+            (new QueryListener($agent))->__invoke($query);
+        });
+    }
+
+    private function instrumentQueues(ScoutApmAgent $agent, Dispatcher $eventDispatcher, bool $runningInConsole) : void
+    {
+        $listener = new JobQueueListener($agent);
+
+        $eventDispatcher->listen(JobProcessing::class, static function (JobProcessing $event) use ($listener) : void {
+            $listener->startRequestForJob($event);
+        });
+
+        $eventDispatcher->listen(JobProcessed::class, static function (JobProcessed $event) use ($listener, $runningInConsole) : void {
+            $listener->stopSpanForJob();
+
+            if (! $runningInConsole) {
+                return;
+            }
+
+            $listener->sendRequestForJob();
+        });
     }
 }

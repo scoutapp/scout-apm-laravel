@@ -2,6 +2,10 @@
 
 ## Pending [1.2.0]
 
+### Added
+
+ - Added support for Laravel Queues (#36)
+
 ### Changed
 
  - [BC] Renamed Scout APM's config file to `scout_apm.php` - if you use this, you will need to rename yours too (#38)
