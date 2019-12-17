@@ -140,7 +140,7 @@ final class ScoutApmServiceProviderTest extends TestCase
 
         $this->application->singleton('config', static function () use ($configName) {
             return new ConfigRepository([
-                'scout' => [Config\ConfigKey::APPLICATION_NAME => $configName],
+                'scout_apm' => [Config\ConfigKey::APPLICATION_NAME => $configName],
             ]);
         });
 
