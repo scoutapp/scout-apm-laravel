@@ -51,7 +51,7 @@ final class ScoutApmServiceProvider extends ServiceProvider
                 array_map(
                     /** @return mixed */
                     static function (string $configurationKey) use ($configRepo) {
-                        return $configRepo->get('scout.' . $configurationKey);
+                        return $configRepo->get('scout_apm.' . $configurationKey);
                     },
                     ConfigKey::allConfigurationKeys()
                 )
@@ -116,7 +116,7 @@ final class ScoutApmServiceProvider extends ServiceProvider
         $log->debug('Agent is starting');
 
         $this->publishes([
-            __DIR__ . '/../../config/scout.php' => config_path('scout.php'),
+            __DIR__ . '/../../config/scout_apm.php' => config_path('scout_apm.php'),
         ]);
 
         $this->installInstruments($kernel, $agent, $connection);

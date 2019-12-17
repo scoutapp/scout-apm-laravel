@@ -5,8 +5,8 @@ declare(strict_types=1);
 /**
  * All of Scout configuration comes from `.env`.
  *
- * This `scout.php` file exists to automatically pull in all env vars into Laravel's configuration repository so that
- * it can be cached, and accessed via the "dot" notation used in the config repository.
+ * This `scout_apm.php` file exists to automatically pull in all env vars into Laravel's configuration repository so
+ * that it can be cached, and accessed via the "dot" notation used in the config repository.
  */
 
 use Scoutapm\Config\ConfigKey;
