@@ -184,4 +184,22 @@ final class ActionInstrumentTest extends TestCase
             )
         );
     }
+
+    /** @throws Throwable */
+    public function testTagAsErrorIfControllerRaises() : void
+    {
+        $this->agent->expects(self::once())
+            ->method('tagRequest')
+            ->with('error', 'true');
+
+        $this->expectException(Throwable::class);
+        $this->expectExceptionMessage('Any old exception');
+
+        $this->middleware->handle(
+            new Request(),
+            static function () : void {
+                throw new Exception('Any old exception');
+            }
+        );
+    }
 }

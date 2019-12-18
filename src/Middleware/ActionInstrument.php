@@ -44,7 +44,12 @@ final class ActionInstrument
             'unknown',
             /** @return mixed */
             function (Span $span) use ($request, $next) {
-                $response = $next($request);
+                try {
+                    $response = $next($request);
+                } catch (Throwable $e) {
+                    $this->agent->tagRequest('error', 'true');
+                    throw $e;
+                }
 
                 $span->updateName($this->automaticallyDetermineControllerName());
 
