@@ -168,8 +168,12 @@ final class ScoutApmServiceProvider extends ServiceProvider
     {
         $listener = new JobQueueListener($agent);
 
-        $eventDispatcher->listen(JobProcessing::class, static function (JobProcessing $event) use ($listener) : void {
-            $listener->startRequestForJob($event);
+        $eventDispatcher->listen(JobProcessing::class, static function (JobProcessing $event) use ($listener, $runningInConsole) : void {
+            if ($runningInConsole) {
+                $listener->startNewRequestForJob();
+            }
+
+            $listener->startSpanForJob($event);
         });
 
         $eventDispatcher->listen(JobProcessed::class, static function (JobProcessed $event) use ($listener, $runningInConsole) : void {

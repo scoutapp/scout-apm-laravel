@@ -21,8 +21,13 @@ final class JobQueueListener
         $this->agent = $agent;
     }
 
+    public function startNewRequestForJob() : void
+    {
+        $this->agent->startNewRequest();
+    }
+
     /** @throws Exception */
-    public function startRequestForJob(JobProcessing $jobProcessingEvent) : void
+    public function startSpanForJob(JobProcessing $jobProcessingEvent) : void
     {
         /** @noinspection UnusedFunctionResultInspection */
         $this->agent->startSpan(sprintf(
