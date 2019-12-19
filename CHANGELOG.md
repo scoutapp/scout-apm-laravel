@@ -1,10 +1,13 @@
 # Changelog
 
-## Pending [1.2.0]
+## Pending [1.2.1]
+
+## [1.2.0] 2019-12-19
 
 ### Added
 
- - Added support for Laravel Queues (#36)
+ - Added support for Laravel Queues (#36, #40)
+ - Uncaught exceptions now cause the `error` tag to be added to the request (#39)
 
 ### Changed
 
