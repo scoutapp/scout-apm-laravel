@@ -28,6 +28,14 @@ final class JobQueueListenerTest extends TestCase
         $this->jobQueueListener = new JobQueueListener($this->agent);
     }
 
+    public function testRequestIsReset() : void
+    {
+        $this->agent->expects(self::once())
+            ->method('startNewRequest');
+
+        $this->jobQueueListener->startNewRequestForJob();
+    }
+
     /** @throws Exception */
     public function testSpanIsStarted() : void
     {
@@ -42,7 +50,7 @@ final class JobQueueListenerTest extends TestCase
 
         $event = new JobProcessing('connection', $job);
 
-        $this->jobQueueListener->startRequestForJob($event);
+        $this->jobQueueListener->startSpanForJob($event);
     }
 
     /** @throws Exception */

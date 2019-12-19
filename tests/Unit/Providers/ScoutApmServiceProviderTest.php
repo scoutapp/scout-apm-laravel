@@ -10,12 +10,16 @@ use Illuminate\Cache\CacheManager;
 use Illuminate\Cache\Repository as CacheRepository;
 use Illuminate\Config\Repository as ConfigRepository;
 use Illuminate\Contracts\Container\BindingResolutionException;
+use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Http\Kernel as HttpKernelInterface;
+use Illuminate\Contracts\Queue\Job;
 use Illuminate\Contracts\View\Engine;
 use Illuminate\Contracts\View\View;
 use Illuminate\Database\Connection;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Http\Kernel as HttpKernelImplementation;
+use Illuminate\Queue\Events\JobProcessed;
+use Illuminate\Queue\Events\JobProcessing;
 use Illuminate\Routing\Router;
 use Illuminate\View\Engines\EngineResolver;
 use Illuminate\View\Factory as ViewFactory;
@@ -267,6 +271,84 @@ final class ScoutApmServiceProviderTest extends TestCase
             ->with(self::isInstanceOf(Closure::class));
 
         $this->bootServiceProvider();
+    }
+
+    /** @throws Throwable */
+    public function testJobQueueIsInstrumentedWhenRunningInConsole() : void
+    {
+        $this->application     = $this->createLaravelApplicationFulfillingBasicRequirementsForScout(true);
+        $this->serviceProvider = new ScoutApmServiceProvider($this->application);
+        $this->serviceProvider->register();
+
+        $this->application->singleton(
+            ScoutApmAgent::class,
+            function () : ScoutApmAgent {
+                return $this->createMock(ScoutApmAgent::class);
+            }
+        );
+
+        $this->bootServiceProvider();
+
+        /** @var Agent&MockObject $agent */
+        $agent = $this->application->make(ScoutApmAgent::class);
+        /** @var Dispatcher $events */
+        $events = $this->application->make('events');
+
+        $agent->expects(self::once())
+            ->method('startNewRequest');
+
+        $agent->expects(self::once())
+            ->method('startSpan');
+
+        $agent->expects(self::once())
+            ->method('stopSpan');
+
+        $agent->expects(self::once())
+            ->method('connect');
+
+        $agent->expects(self::once())
+            ->method('send');
+
+        $events->dispatch(new JobProcessing('foo', $this->createMock(Job::class)));
+        $events->dispatch(new JobProcessed('foo', $this->createMock(Job::class)));
+    }
+
+    /** @throws Throwable */
+    public function testJobQueueIsInstrumentedWhenRunningInHttp() : void
+    {
+        $this->serviceProvider->register();
+
+        $this->application->singleton(
+            ScoutApmAgent::class,
+            function () : ScoutApmAgent {
+                return $this->createMock(ScoutApmAgent::class);
+            }
+        );
+
+        $this->bootServiceProvider();
+
+        /** @var Agent&MockObject $agent */
+        $agent = $this->application->make(ScoutApmAgent::class);
+        /** @var Dispatcher $events */
+        $events = $this->application->make('events');
+
+        $agent->expects(self::never())
+            ->method('startNewRequest');
+
+        $agent->expects(self::once())
+            ->method('startSpan');
+
+        $agent->expects(self::once())
+            ->method('stopSpan');
+
+        $agent->expects(self::never())
+            ->method('connect');
+
+        $agent->expects(self::never())
+            ->method('send');
+
+        $events->dispatch(new JobProcessing('foo', $this->createMock(Job::class)));
+        $events->dispatch(new JobProcessed('foo', $this->createMock(Job::class)));
     }
 
     /** @throws BindingResolutionException */
