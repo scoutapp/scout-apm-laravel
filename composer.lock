@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "1a4492e03ba66159dd47e3f4acfeead7",
+    "content-hash": "22e00ced600f35f37367cfae84bf5b36",
     "packages": [
         {
             "name": "doctrine/inflector",
@@ -1159,16 +1159,16 @@
         },
         {
             "name": "scoutapp/scout-apm-php",
-            "version": "v3.0.0",
+            "version": "dev-master",
             "source": {
                 "type": "git",
                 "url": "https://github.com/scoutapp/scout-apm-php.git",
-                "reference": "b16446e538dde680f171d6a8254dcc32c41651ac"
+                "reference": "b51addeb959f2718adb802c809578362b5c94a9e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/scoutapp/scout-apm-php/zipball/b16446e538dde680f171d6a8254dcc32c41651ac",
-                "reference": "b16446e538dde680f171d6a8254dcc32c41651ac",
+                "url": "https://api.github.com/repos/scoutapp/scout-apm-php/zipball/b51addeb959f2718adb802c809578362b5c94a9e",
+                "reference": "b51addeb959f2718adb802c809578362b5c94a9e",
                 "shasum": ""
             },
             "require": {
@@ -1214,7 +1214,7 @@
                 "monitoring",
                 "performance"
             ],
-            "time": "2019-12-19T08:34:14+00:00"
+            "time": "2019-12-20T08:49:02+00:00"
         },
         {
             "name": "swiftmailer/swiftmailer",
@@ -5935,6 +5935,7 @@
     "aliases": [],
     "minimum-stability": "stable",
     "stability-flags": {
+        "scoutapp/scout-apm-php": 20,
         "roave/security-advisories": 20
     },
     "prefer-stable": false,
