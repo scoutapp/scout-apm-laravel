@@ -3,3 +3,4 @@ composer.phar
 .idea
 .phpcs-cache
 .phpunit.result.cache
+build
