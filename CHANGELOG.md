@@ -1,6 +1,8 @@
 # Changelog
 
-## Pending [1.2.1]
+## Pending [1.2.2]
+
+## [1.2.1] 2019-12-31
 
 ### Changed
 
