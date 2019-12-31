@@ -34,6 +34,8 @@ use ReflectionProperty;
 use Scoutapm\Agent;
 use Scoutapm\Cache\DevNullCache;
 use Scoutapm\Config;
+use Scoutapm\Connector\Connector;
+use Scoutapm\Events\Metadata;
 use Scoutapm\Laravel\Middleware\ActionInstrument;
 use Scoutapm\Laravel\Middleware\IgnoredEndpoints;
 use Scoutapm\Laravel\Middleware\MiddlewareInstrument;
@@ -43,6 +45,8 @@ use Scoutapm\Laravel\View\Engine\ScoutViewEngineDecorator;
 use Scoutapm\Logger\FilteredLogLevelDecorator;
 use Scoutapm\ScoutApmAgent;
 use Throwable;
+use function json_decode;
+use function json_encode;
 use function putenv;
 use function sprintf;
 use function sys_get_temp_dir;
@@ -52,6 +56,9 @@ use function uniqid;
 final class ScoutApmServiceProviderTest extends TestCase
 {
     use MockeryPHPUnitIntegration;
+
+    private const CONFIG_SERVICE_KEY = ScoutApmAgent::class . '_config';
+    private const CACHE_SERVICE_KEY  = ScoutApmAgent::class . '_cache';
 
     private const VIEW_ENGINES_TO_WRAP = ['file', 'php', 'blade'];
 
@@ -349,6 +356,53 @@ final class ScoutApmServiceProviderTest extends TestCase
 
         $events->dispatch(new JobProcessing('foo', $this->createMock(Job::class)));
         $events->dispatch(new JobProcessed('foo', $this->createMock(Job::class)));
+    }
+
+    /** @throws BindingResolutionException */
+    public function testMetadataContainsFrameworkNameAndVersion() : void
+    {
+        $connectorMock = $this->createMock(Connector::class);
+
+        $this->application->singleton('config', static function () {
+            return new ConfigRepository([
+                'scout_apm' => [
+                    Config\ConfigKey::APPLICATION_NAME => 'Laravel Provider Test',
+                    Config\ConfigKey::APPLICATION_KEY => 'test application key',
+                    Config\ConfigKey::MONITORING_ENABLED => true,
+                ],
+            ]);
+        });
+
+        $this->serviceProvider->register();
+
+        $this->application->singleton(ScoutApmAgent::class, function () use ($connectorMock) {
+            return Agent::fromConfig(
+                $this->application->make(self::CONFIG_SERVICE_KEY),
+                $this->application->make(FilteredLogLevelDecorator::class),
+                $this->application->make(self::CACHE_SERVICE_KEY),
+                $connectorMock
+            );
+        });
+
+        $this->bootServiceProvider();
+
+        $connectorMock->expects(self::at(3))
+            ->method('sendCommand')
+            ->with(self::callback(static function (Metadata $metadata) {
+                $flattenedMetadata = json_decode(json_encode($metadata), true)['ApplicationEvent']['event_value'];
+
+                self::assertArrayHasKey('framework', $flattenedMetadata);
+                self::assertSame('Laravel', $flattenedMetadata['framework']);
+
+                self::assertArrayHasKey('framework_version', $flattenedMetadata);
+                self::assertNotSame('', $flattenedMetadata['framework_version']);
+
+                return true;
+            }));
+
+        /** @var ScoutApmAgent $agent */
+        $agent = $this->application->make(ScoutApmAgent::class);
+        $agent->send();
     }
 
     /** @throws BindingResolutionException */

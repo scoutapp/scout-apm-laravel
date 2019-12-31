@@ -2,6 +2,10 @@
 
 ## Pending [1.2.1]
 
+### Changed
+
+ - Configure Laravel framework name and version automatically (#42)
+
 ## [1.2.0] 2019-12-19
 
 ### Added

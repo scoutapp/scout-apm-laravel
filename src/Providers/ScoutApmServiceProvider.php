@@ -36,6 +36,7 @@ use Throwable;
 use function array_combine;
 use function array_filter;
 use function array_map;
+use function array_merge;
 use function config_path;
 
 final class ScoutApmServiceProvider extends ServiceProvider
@@ -51,16 +52,22 @@ final class ScoutApmServiceProvider extends ServiceProvider
         $this->app->singleton(self::CONFIG_SERVICE_KEY, function () {
             $configRepo = $this->app->make(ConfigRepository::class);
 
-            return Config::fromArray(array_filter(array_combine(
-                ConfigKey::allConfigurationKeys(),
-                array_map(
+            return Config::fromArray(array_merge(
+                array_filter(array_combine(
+                    ConfigKey::allConfigurationKeys(),
+                    array_map(
                     /** @return mixed */
-                    static function (string $configurationKey) use ($configRepo) {
-                        return $configRepo->get('scout_apm.' . $configurationKey);
-                    },
-                    ConfigKey::allConfigurationKeys()
-                )
-            )));
+                        static function (string $configurationKey) use ($configRepo) {
+                            return $configRepo->get('scout_apm.' . $configurationKey);
+                        },
+                        ConfigKey::allConfigurationKeys()
+                    )
+                )),
+                [
+                    ConfigKey::FRAMEWORK => 'Laravel',
+                    ConfigKey::FRAMEWORK_VERSION => $this->app->version(),
+                ]
+            ));
         });
 
         $this->app->singleton(self::CACHE_SERVICE_KEY, static function (Application $app) {
