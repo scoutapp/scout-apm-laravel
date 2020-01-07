@@ -358,6 +358,53 @@ final class ScoutApmServiceProviderTest extends TestCase
         $events->dispatch(new JobProcessed('foo', $this->createMock(Job::class)));
     }
 
+    /** @throws Throwable */
+    public function testJobQueuesAreNotInstrumentedWhenNotConfigured() : void
+    {
+        $this->application     = $this->createLaravelApplicationFulfillingBasicRequirementsForScout(true);
+        $this->serviceProvider = new ScoutApmServiceProvider($this->application);
+
+        $this->application->singleton('config', static function () {
+            return new ConfigRepository([
+                'scout_apm' => [ScoutApmServiceProvider::CONFIG_INSTRUMENT_LARAVEL_QUEUES => 'false'],
+            ]);
+        });
+
+        $this->serviceProvider->register();
+
+        $this->application->singleton(
+            ScoutApmAgent::class,
+            function () : ScoutApmAgent {
+                return $this->createMock(ScoutApmAgent::class);
+            }
+        );
+
+        $this->bootServiceProvider();
+
+        /** @var Agent&MockObject $agent */
+        $agent = $this->application->make(ScoutApmAgent::class);
+        /** @var Dispatcher $events */
+        $events = $this->application->make('events');
+
+        $agent->expects(self::never())
+            ->method('startNewRequest');
+
+        $agent->expects(self::never())
+            ->method('startSpan');
+
+        $agent->expects(self::never())
+            ->method('stopSpan');
+
+        $agent->expects(self::never())
+            ->method('connect');
+
+        $agent->expects(self::never())
+            ->method('send');
+
+        $events->dispatch(new JobProcessing('foo', $this->createMock(Job::class)));
+        $events->dispatch(new JobProcessed('foo', $this->createMock(Job::class)));
+    }
+
     /** @throws BindingResolutionException */
     public function testMetadataContainsFrameworkNameAndVersion() : void
     {

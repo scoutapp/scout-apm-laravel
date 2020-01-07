@@ -9,16 +9,16 @@ declare(strict_types=1);
  * that it can be cached, and accessed via the "dot" notation used in the config repository.
  */
 
-use Scoutapm\Config\ConfigKey;
+use Scoutapm\Laravel\Providers\ScoutApmServiceProvider;
 
 /** @noinspection PhpUnnecessaryLocalVariableInspection */
 $config = array_combine(
-    ConfigKey::allConfigurationKeys(),
+    ScoutApmServiceProvider::allConfigurationAndFrameworkKeys(),
     array_map(
         static function ($configKey) {
             return env('SCOUT_' . strtoupper($configKey), null);
         },
-        ConfigKey::allConfigurationKeys()
+        ScoutApmServiceProvider::allConfigurationAndFrameworkKeys()
     )
 );
 
