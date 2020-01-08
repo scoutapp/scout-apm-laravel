@@ -393,12 +393,13 @@ final class ScoutApmServiceProviderTest extends TestCase
             }
         );
 
-        $this->bootServiceProvider();
-
         /** @var Agent&MockObject $agent */
         $agent = $this->application->make(ScoutApmAgent::class);
-        /** @var Dispatcher $events */
-        $events = $this->application->make('events');
+
+        $agent->expects(self::once())
+            ->method('shouldInstrument')
+            ->with(ScoutApmServiceProvider::INSTRUMENT_LARAVEL_QUEUES)
+            ->willReturn(false);
 
         $agent->expects(self::never())
             ->method('startNewRequest');
@@ -414,6 +415,11 @@ final class ScoutApmServiceProviderTest extends TestCase
 
         $agent->expects(self::never())
             ->method('send');
+
+        $this->bootServiceProvider();
+
+        /** @var Dispatcher $events */
+        $events = $this->application->make('events');
 
         $events->dispatch(new JobProcessing('foo', $this->createMock(Job::class)));
         $events->dispatch(new JobProcessed('foo', $this->createMock(Job::class)));
