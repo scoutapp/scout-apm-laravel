@@ -46,16 +46,7 @@ final class ScoutApmServiceProvider extends ServiceProvider
 
     private const VIEW_ENGINES_TO_WRAP = ['file', 'php', 'blade'];
 
-    public const CONFIG_INSTRUMENT_LARAVEL_QUEUES = 'instrument_laravel_queues';
-
-    /** @return string[] */
-    public static function allConfigurationAndFrameworkKeys() : array
-    {
-        return array_merge(
-            ConfigKey::allConfigurationKeys(),
-            [self::CONFIG_INSTRUMENT_LARAVEL_QUEUES]
-        );
-    }
+    public const INSTRUMENT_LARAVEL_QUEUES = 'laravel_queues';
 
     /** @throws BindingResolutionException */
     public function register() : void
@@ -65,13 +56,13 @@ final class ScoutApmServiceProvider extends ServiceProvider
 
             return Config::fromArray(array_merge(
                 array_filter(array_combine(
-                    self::allConfigurationAndFrameworkKeys(),
+                    ConfigKey::allConfigurationKeys(),
                     array_map(
                     /** @return mixed */
                         static function (string $configurationKey) use ($configRepo) {
                             return $configRepo->get('scout_apm.' . $configurationKey);
                         },
-                        self::allConfigurationAndFrameworkKeys()
+                        ConfigKey::allConfigurationKeys()
                     )
                 )),
                 [
@@ -142,8 +133,6 @@ final class ScoutApmServiceProvider extends ServiceProvider
     ) : void {
         $log->debug('Agent is starting');
 
-        $scoutConfig = $application->get(self::CONFIG_SERVICE_KEY);
-
         $this->publishes([
             __DIR__ . '/../../config/scout_apm.php' => config_path('scout_apm.php'),
         ]);
@@ -152,7 +141,7 @@ final class ScoutApmServiceProvider extends ServiceProvider
 
         $this->instrumentDatabaseQueries($agent, $connection);
 
-        if ($this->shouldInstrumentQueues($scoutConfig)) {
+        if ($agent->shouldInstrument(self::INSTRUMENT_LARAVEL_QUEUES)) {
             $this->instrumentQueues($agent, $application->make('events'), $runningInConsole);
         }
 
@@ -162,17 +151,6 @@ final class ScoutApmServiceProvider extends ServiceProvider
 
         $httpKernel = $application->make(HttpKernelInterface::class);
         $this->instrumentMiddleware($httpKernel);
-    }
-
-    private function shouldInstrumentQueues(Config $config) : bool
-    {
-        $configValue = $config->get(self::CONFIG_INSTRUMENT_LARAVEL_QUEUES);
-
-        if ($configValue === null) {
-            return true;
-        }
-
-        return (new Config\TypeCoercion\CoerceBoolean())->coerce($configValue);
     }
 
     /**
