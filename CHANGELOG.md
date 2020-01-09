@@ -1,6 +1,12 @@
 # Changelog
 
-## Pending [1.2.3]
+## Pending [1.2.4]
+
+## [1.2.3] 2020-01-09
+
+### Fixed
+
+ - Fixed bug with interaction with blade directives from third party plugins (#46)
 
 ## [1.2.2] 2020-01-09
 
