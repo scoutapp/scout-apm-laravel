@@ -46,6 +46,8 @@ final class ScoutApmServiceProvider extends ServiceProvider
 
     private const VIEW_ENGINES_TO_WRAP = ['file', 'php', 'blade'];
 
+    public const INSTRUMENT_LARAVEL_QUEUES = 'laravel_queues';
+
     /** @throws BindingResolutionException */
     public function register() : void
     {
@@ -138,7 +140,10 @@ final class ScoutApmServiceProvider extends ServiceProvider
         $runningInConsole = $application->runningInConsole();
 
         $this->instrumentDatabaseQueries($agent, $connection);
-        $this->instrumentQueues($agent, $application->make('events'), $runningInConsole);
+
+        if ($agent->shouldInstrument(self::INSTRUMENT_LARAVEL_QUEUES)) {
+            $this->instrumentQueues($agent, $application->make('events'), $runningInConsole);
+        }
 
         if ($runningInConsole) {
             return;
