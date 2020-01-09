@@ -95,16 +95,15 @@ final class ScoutApmServiceProvider extends ServiceProvider
             );
         });
 
-        /** @var EngineResolver $viewResolver */
-        $viewResolver = $this->app->make('view.engine.resolver');
+        $this->app->afterResolving('view.engine.resolver', function (EngineResolver $engineResolver) : void {
+            foreach (self::VIEW_ENGINES_TO_WRAP as $engineName) {
+                $realEngine = $engineResolver->resolve($engineName);
 
-        foreach (self::VIEW_ENGINES_TO_WRAP as $engineName) {
-            $realEngine = $viewResolver->resolve($engineName);
-
-            $viewResolver->register($engineName, function () use ($realEngine) {
-                return $this->wrapEngine($realEngine);
-            });
-        }
+                $engineResolver->register($engineName, function () use ($realEngine) {
+                    return $this->wrapEngine($realEngine);
+                });
+            }
+        });
     }
 
     public function wrapEngine(Engine $realEngine) : Engine
