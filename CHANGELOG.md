@@ -1,6 +1,12 @@
 # Changelog
 
-## Pending [1.2.2]
+## Pending [1.2.3]
+
+## [1.2.2] 2020-01-09
+
+### Added
+
+ - Added configuration to disable Laravel Queues instrumentation, `disabled_instruments=["laravel_queues"]` (#44)
 
 ## [1.2.1] 2019-12-31
 
