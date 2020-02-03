@@ -124,7 +124,7 @@ final class ScoutApmServiceProvider extends ServiceProvider
         /** @var ViewFactory $viewFactory */
         $viewFactory = $this->app->make('view');
 
-        if (class_exists(Engine)) {
+        if (class_exists(Engine::class)) {
             /** @noinspection UnusedFunctionResultInspection */
             $viewFactory->composer('*', static function (View $view) use ($viewFactory) : void {
                 $viewFactory->share(ScoutViewEngineDecorator::VIEW_FACTORY_SHARED_KEY, $view->name());
