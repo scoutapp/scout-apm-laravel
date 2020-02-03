@@ -18,6 +18,7 @@ use Illuminate\Foundation\Http\Kernel as HttpKernelImplementation;
 use Illuminate\Queue\Events\JobProcessed;
 use Illuminate\Queue\Events\JobProcessing;
 use Illuminate\Support\ServiceProvider;
+use Illuminate\View\Engines\CompilerEngine;
 use Illuminate\View\Engines\EngineResolver;
 use Illuminate\View\Factory as ViewFactory;
 use Scoutapm\Agent;
@@ -29,6 +30,7 @@ use Scoutapm\Laravel\Middleware\IgnoredEndpoints;
 use Scoutapm\Laravel\Middleware\MiddlewareInstrument;
 use Scoutapm\Laravel\Middleware\SendRequestToScout;
 use Scoutapm\Laravel\Queue\JobQueueListener;
+use Scoutapm\Laravel\View\Engine\ScoutViewCompilerEngineDecorator;
 use Scoutapm\Laravel\View\Engine\ScoutViewEngineDecorator;
 use Scoutapm\Logger\FilteredLogLevelDecorator;
 use Scoutapm\ScoutApmAgent;
@@ -44,9 +46,11 @@ final class ScoutApmServiceProvider extends ServiceProvider
     private const CONFIG_SERVICE_KEY = ScoutApmAgent::class . '_config';
     private const CACHE_SERVICE_KEY  = ScoutApmAgent::class . '_cache';
 
-    private const VIEW_ENGINES_TO_WRAP = ['file', 'php', 'blade'];
+    private const VIEW_ENGINES_TO_WRAP = ['file', 'php', 'blade', 'twig'];
 
     public const INSTRUMENT_LARAVEL_QUEUES = 'laravel_queues';
+
+    private $resolveEngineResolverOnBoot = false;
 
     /** @throws BindingResolutionException */
     public function register() : void
@@ -74,7 +78,8 @@ final class ScoutApmServiceProvider extends ServiceProvider
 
         $this->app->singleton(self::CACHE_SERVICE_KEY, static function (Application $app) {
             try {
-                return $app->make(CacheManager::class)->store();
+                $cacheManager = $app->make(CacheManager::class)->store();
+                return $cacheManager instanceof Psr\SimpleCache\CacheInterface ? $cacheManager : null;
             } catch (Throwable $anything) {
                 return null;
             }
@@ -95,28 +100,47 @@ final class ScoutApmServiceProvider extends ServiceProvider
             );
         });
 
-        $this->app->afterResolving('view.engine.resolver', function (EngineResolver $engineResolver) : void {
-            foreach (self::VIEW_ENGINES_TO_WRAP as $engineName) {
-                $realEngine = $engineResolver->resolve($engineName);
-
-                $engineResolver->register($engineName, function () use ($realEngine) {
-                    return $this->wrapEngine($realEngine);
-                });
-            }
-        });
+        /**
+         * Depending on the laravel version and what other services are loaded, sometimes this is already resolved
+         * If this is the case, then there isn't much point setting this, but we can handle it in the boot
+         */
+        if (!$this->app->resolved('view.engine.resolver')) {
+            $this->app->afterResolving('view.engine.resolver', function (EngineResolver $engineResolver): void {
+                $this->resolveEngines($engineResolver);
+            });
+        } else {
+            $this->resolveEngineResolverOnBoot = true;
+        }
     }
 
-    public function wrapEngine(Engine $realEngine) : Engine
+    /**
+     * Going forward, we could use Union Types to hint this
+     * @param Engine|CompilerEngine $realEngine
+     *
+     * @return Engine|CompilerEngine
+     */
+    public function wrapEngine($realEngine)
     {
         /** @var ViewFactory $viewFactory */
         $viewFactory = $this->app->make('view');
 
-        /** @noinspection UnusedFunctionResultInspection */
+        if (class_exists(Engine)) {
+            /** @noinspection UnusedFunctionResultInspection */
+            $viewFactory->composer('*', static function (View $view) use ($viewFactory) : void {
+                $viewFactory->share(ScoutViewEngineDecorator::VIEW_FACTORY_SHARED_KEY, $view->name());
+            });
+
+            return new ScoutViewEngineDecorator(
+                $realEngine,
+                $this->app->make(ScoutApmAgent::class),
+                $viewFactory
+            );
+        }
         $viewFactory->composer('*', static function (View $view) use ($viewFactory) : void {
-            $viewFactory->share(ScoutViewEngineDecorator::VIEW_FACTORY_SHARED_KEY, $view->name());
+            $viewFactory->share(ScoutViewCompilerEngineDecorator::VIEW_FACTORY_SHARED_KEY, $view->name());
         });
 
-        return new ScoutViewEngineDecorator(
+        return new ScoutViewCompilerEngineDecorator(
             $realEngine,
             $this->app->make(ScoutApmAgent::class),
             $viewFactory
@@ -150,6 +174,33 @@ final class ScoutApmServiceProvider extends ServiceProvider
 
         $httpKernel = $application->make(HttpKernelInterface::class);
         $this->instrumentMiddleware($httpKernel);
+
+        if ($this->resolveEngineResolverOnBoot) {
+            $engineResolver = $this->app['view.engine.resolver'];
+            $this->resolveEngines($engineResolver);
+
+            /**
+             * Just to be on the safe side, prevent re-resolving
+             */
+            $this->resolveEngineResolverOnBoot = false;
+        }
+    }
+
+    private function resolveEngines(EngineResolver $engineResolver)
+    {
+        foreach (self::VIEW_ENGINES_TO_WRAP as $engineName) {
+            try {
+                $realEngine = $engineResolver->resolve($engineName);
+
+                $engineResolver->register($engineName, function () use ($realEngine) {
+                    return $this->wrapEngine($realEngine);
+                });
+            } catch (\InvalidArgumentException $anything) {
+                /**
+                 * Depending on the version of laravel, not every resolver exists
+                 */
+            }
+        }
     }
 
     /**
@@ -170,9 +221,17 @@ final class ScoutApmServiceProvider extends ServiceProvider
 
     private function instrumentDatabaseQueries(ScoutApmAgent $agent, Connection $connection) : void
     {
-        $connection->listen(static function (QueryExecuted $query) use ($agent) : void {
-            (new QueryListener($agent))->__invoke($query);
-        });
+        if (class_exists(QueryExecuted::class)) {
+            $connection->listen(static function (QueryExecuted $query) use ($agent) : void {
+                (new QueryListener($agent))->__invoke($query);
+            });
+        } else {
+            require_once __DIR__ . "/../Database/QueryExecuted.php";
+            $connection->listen(static function ($sql, $bindings, $time) use ($agent) : void {
+                $query = new QueryExecuted($sql, $bindings, $time);
+                (new QueryListener($agent))->__invoke($query);
+            });
+        }
     }
 
     private function instrumentQueues(ScoutApmAgent $agent, Dispatcher $eventDispatcher, bool $runningInConsole) : void
