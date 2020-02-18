@@ -1,78 +1,275 @@
 # Changelog
 
-## Pending [1.2.4]
+All notable changes to this project will be documented in this file, in reverse chronological order by release.
 
-## [1.2.3] 2020-01-09
-
-### Fixed
-
- - Fixed bug with interaction with blade directives from third party plugins (#46)
-
-## [1.2.2] 2020-01-09
+## 1.2.4 - TBD
 
 ### Added
 
- - Added configuration to disable Laravel Queues instrumentation, `disabled_instruments=["laravel_queues"]` (#44)
-
-## [1.2.1] 2019-12-31
+- Nothing.
 
 ### Changed
 
- - Configure Laravel framework name and version automatically (#42)
+- Nothing.
 
-## [1.2.0] 2019-12-19
+### Deprecated
 
-### Added
+- Nothing.
 
- - Added support for Laravel Queues (#36, #40)
- - Uncaught exceptions now cause the `error` tag to be added to the request (#39)
+### Removed
 
-### Changed
-
- - [BC] Renamed Scout APM's config file to `scout_apm.php` - if you use this, you will need to rename yours too (#38)
-   - This was done to avoid a conflict with [Laravel Scout](https://laravel.com/docs/6.x/scout) configuration.
-
-## [1.1.0] 2019-12-09
-
- - Support for PHP 7.4 (#32)
- - Use Laravel's Config Repository for Scout configuration, so that config can now be cached (#34)
-
-## [1.0.0] 2019-12-04
-
-### Changed
-
- - Required `scoutapp/scout-apm-php` at `^2.0`
- - Use Laravel's Cache, if configured, for the agent to cache metadata
- - Removed duplicate `[Scout]` text from log messages
-
-## [0.2.3] 2019-10-07
+- Nothing.
 
 ### Fixed
 
- - Type mismatch in JsonResponse Middlewares (#21)
+- Nothing.
 
-## [0.2.2] 2019-09-26
+## 1.2.3 - 2020-01-09
+
+### Added
+
+- Nothing.
+
+### Changed
+
+- Nothing.
+
+### Deprecated
+
+- Nothing.
+
+### Removed
+
+- Nothing.
 
 ### Fixed
 
- - CoreAgent now only connects during web requests, not other situations
- - Updates to underlying scout-apm-php v0.2.2
+- [#46](https://github.com/scoutapp/scout-apm-laravel/pull/46) Fixed bug with interaction with blade directives from third party plugins
 
-## [0.2.1] 2019-09-25
-
-### Added
-
- - Lots of changes to make the agent more ergonomic
- - Updates to underlying scout-apm-php v0.2.1
-
-## [0.2.0] 2019-08-23
+## 1.2.2 - 2020-01-09
 
 ### Added
 
- - View instrumentation for Blade, PHP, and File engines (#4)
- - Licensed as MIT (#6)
+- [#44](https://github.com/scoutapp/scout-apm-laravel/pull/44) Added configuration to disable Laravel Queues instrumentation, `disabled_instruments=["laravel_queues"]`
 
-## [0.1.1] 2019-08-23
+### Changed
 
-Initial Release. See documentation at https://docs.scoutapm.com
+- Nothing.
 
+### Deprecated
+
+- Nothing.
+
+### Removed
+
+- Nothing.
+
+### Fixed
+
+- Nothing.
+
+## 1.2.1 - 2019-12-31
+
+### Added
+
+- [#42](https://github.com/scoutapp/scout-apm-laravel/pull/42) Configure Laravel framework name and version automatically
+
+### Changed
+
+- Nothing.
+
+### Deprecated
+
+- Nothing.
+
+### Removed
+
+- Nothing.
+
+### Fixed
+
+- Nothing.
+
+## 1.2.0 - 2019-12-19
+
+### Added
+
+- [#36](https://github.com/scoutapp/scout-apm-laravel/pull/36), [#40](https://github.com/scoutapp/scout-apm-laravel/pull/40) Added support for Laravel Queues
+- [#39](https://github.com/scoutapp/scout-apm-laravel/pull/39) Uncaught exceptions now cause the `error` tag to be added to the request
+
+### Changed
+
+- [#38](https://github.com/scoutapp/scout-apm-laravel/pull/38) **[BC]** Renamed Scout APM's config file to `scout_apm.php` - if you use this, you will need to rename yours too (#38)
+  - This was done to avoid a conflict with [Laravel Scout](https://laravel.com/docs/6.x/scout) configuration.
+
+### Deprecated
+
+- Nothing.
+
+### Removed
+
+- Nothing.
+
+### Fixed
+
+- Nothing.
+
+## 1.1.0 - 2019-12-09
+
+### Added
+
+- Nothing.
+
+### Changed
+
+- [#32](https://github.com/scoutapp/scout-apm-laravel/pull/32) Support for PHP 7.4
+- [#34](https://github.com/scoutapp/scout-apm-laravel/pull/34) Use Laravel's Config Repository for Scout configuration, so that config can now be cached
+
+### Deprecated
+
+- Nothing.
+
+### Removed
+
+- Nothing.
+
+### Fixed
+
+- Nothing.
+
+## 1.0.0 - 2019-12-04
+
+### Added
+
+- Nothing.
+
+### Changed
+
+- Required `scoutapp/scout-apm-php` at `^2.0`
+- Use Laravel's Cache, if configured, for the agent to cache metadata
+- Removed duplicate `[Scout]` text from log messages
+
+### Deprecated
+
+- Nothing.
+
+### Removed
+
+- Nothing.
+
+### Fixed
+
+- Nothing.
+
+## 0.2.3 - 2019-10-07
+
+### Added
+
+- Nothing.
+
+### Changed
+
+- Nothing.
+
+### Deprecated
+
+- Nothing.
+
+### Removed
+
+- Nothing.
+
+### Fixed
+
+- [#21](https://github.com/scoutapp/scout-apm-laravel/pull/21) Type mismatch in JsonResponse Middlewares
+
+## 0.2.2 - 2019-09-26
+
+### Added
+
+- Nothing.
+
+### Changed
+
+- Nothing.
+
+### Deprecated
+
+- Nothing.
+
+### Removed
+
+- Nothing.
+
+### Fixed
+
+- CoreAgent now only connects during web requests, not other situations
+- Updates to underlying scout-apm-php v0.2.2
+
+## 0.2.1 - 2019-09-25
+
+### Added
+
+- Lots of changes to make the agent more ergonomic
+- Updates to underlying scout-apm-php v0.2.1
+
+### Changed
+
+- Nothing.
+
+### Deprecated
+
+- Nothing.
+
+### Removed
+
+- Nothing.
+
+### Fixed
+
+- Nothing.
+
+## 0.2.0 - 2019-08-23
+
+### Added
+
+- [#4](https://github.com/scoutapp/scout-apm-laravel/pull/4) View instrumentation for Blade, PHP, and File engines
+- [#6](https://github.com/scoutapp/scout-apm-laravel/pull/6) Licensed as MIT
+
+### Changed
+
+- Nothing.
+
+### Deprecated
+
+- Nothing.
+
+### Removed
+
+- Nothing.
+
+### Fixed
+
+- Nothing.
+
+## 0.1.1 - 2019-08-23
+
+### Added
+
+- Initial Release. See documentation at https://docs.scoutapm.com
+
+### Changed
+
+- Nothing.
+
+### Deprecated
+
+- Nothing.
+
+### Removed
+
+- Nothing.
+
+### Fixed
+
+- Nothing.
