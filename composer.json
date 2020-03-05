@@ -25,6 +25,7 @@
         "ext-json": "*",
         "ext-pdo": "*",
         "ext-pdo_sqlite": "*",
+        "ext-scoutapm": "*",
         "doctrine/coding-standard": "^6.0",
         "laravel/framework": "^5.5.0|^6.0",
         "mockery/mockery": "^1.2|^1.3",

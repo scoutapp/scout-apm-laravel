@@ -32,11 +32,11 @@ final class QueryListenerTest extends TestCase
     public function testControllerTimeDoesNotBecomeNegativeWhenExtensionEnabled() : void
     {
         if (! extension_loaded('scoutapm')) {
-            self::markTestSkipped('scoutapm extension must be enabled for this test');
+            self::fail('scoutapm extension must be enabled for this test');
         }
 
         if (! extension_loaded('pdo_sqlite')) {
-            self::markTestSkipped('pdo_sqlite extension must be enabled for this test');
+            self::fail('pdo_sqlite extension must be enabled for this test');
         }
 
         $connector    = $this->createMock(Connector::class);
