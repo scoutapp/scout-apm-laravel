@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "e5aa6f63f8eed74ce797a2ccc7c28097",
+    "content-hash": "9e6b18a84cf3ce4f8f24a7d3cf82a404",
     "packages": [
         {
             "name": "doctrine/inflector",
@@ -1238,16 +1238,16 @@
         },
         {
             "name": "scoutapp/scout-apm-php",
-            "version": "v4.1.0",
+            "version": "v4.2.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/scoutapp/scout-apm-php.git",
-                "reference": "b7f057eaf6b448548d7033cab3869939c52f1e49"
+                "reference": "e9de7dcb9c2ddf9b5fcd9b9b850bd4d579a59c09"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/scoutapp/scout-apm-php/zipball/b7f057eaf6b448548d7033cab3869939c52f1e49",
-                "reference": "b7f057eaf6b448548d7033cab3869939c52f1e49",
+                "url": "https://api.github.com/repos/scoutapp/scout-apm-php/zipball/e9de7dcb9c2ddf9b5fcd9b9b850bd4d579a59c09",
+                "reference": "e9de7dcb9c2ddf9b5fcd9b9b850bd4d579a59c09",
                 "shasum": ""
             },
             "require": {
@@ -1293,7 +1293,7 @@
                 "monitoring",
                 "performance"
             ],
-            "time": "2020-03-05T09:38:29+00:00"
+            "time": "2020-03-17T12:24:07+00:00"
         },
         {
             "name": "swiftmailer/swiftmailer",
