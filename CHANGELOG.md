@@ -2,11 +2,11 @@
 
 All notable changes to this project will be documented in this file, in reverse chronological order by release.
 
-## 1.2.4 - TBD
+## 1.3.0 - 2020-03-17
 
 ### Added
 
-- Nothing.
+- [#51](https://github.com/scoutapp/scout-apm-laravel/pull/51) Added support for Laravel 7.x series
 
 ### Changed
 
