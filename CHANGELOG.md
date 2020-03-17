@@ -10,7 +10,7 @@ All notable changes to this project will be documented in this file, in reverse 
 
 ### Changed
 
-- Nothing.
+- [#52](https://github.com/scoutapp/scout-apm-laravel/pull/52) Require minimum ^4.2 for scout-apm-php to upgrade to core-agent 1.2.8
 
 ### Deprecated
 
