@@ -11,6 +11,8 @@ env:
   - DEPENDENCIES=""
 
 before_script:
+  - pecl install scoutapm
+  - echo "zend_extension=scoutapm.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
   - composer self-update
   - rm composer.lock
   - composer update --prefer-dist $DEPENDENCIES

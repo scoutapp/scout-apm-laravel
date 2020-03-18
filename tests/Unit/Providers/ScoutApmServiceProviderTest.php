@@ -36,6 +36,7 @@ use Scoutapm\Cache\DevNullCache;
 use Scoutapm\Config;
 use Scoutapm\Connector\Connector;
 use Scoutapm\Events\Metadata;
+use Scoutapm\Extension\PotentiallyAvailableExtensionCapabilities;
 use Scoutapm\Laravel\Middleware\ActionInstrument;
 use Scoutapm\Laravel\Middleware\IgnoredEndpoints;
 use Scoutapm\Laravel\Middleware\MiddlewareInstrument;
@@ -206,6 +207,7 @@ final class ScoutApmServiceProviderTest extends TestCase
             ->with(ScoutViewEngineDecorator::VIEW_FACTORY_SHARED_KEY, 'unknown')
             ->willReturn($templateName);
 
+        (new PotentiallyAvailableExtensionCapabilities())->clearRecordedCalls();
         $engine = $viewResolver->resolve('file');
         self::assertSame('Fake view engine for [file] - rendered path "/path/to/view"', $engine->get('/path/to/view'));
 
