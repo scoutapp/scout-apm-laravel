@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "f96ab3da3fed24a62bf00601686cc2f6",
+    "content-hash": "60e872529e6bd325b3bfc00682447107",
     "packages": [
         {
             "name": "doctrine/inflector",
@@ -1343,16 +1343,16 @@
         },
         {
             "name": "scoutapp/scout-apm-php",
-            "version": "v4.3.0",
+            "version": "v4.4.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/scoutapp/scout-apm-php.git",
-                "reference": "ee6b0ee132d5fef71c21b07b4b8297299b888609"
+                "reference": "7d2615f9ea6a1bab2ac7ae91bb55f74680b03bae"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/scoutapp/scout-apm-php/zipball/ee6b0ee132d5fef71c21b07b4b8297299b888609",
-                "reference": "ee6b0ee132d5fef71c21b07b4b8297299b888609",
+                "url": "https://api.github.com/repos/scoutapp/scout-apm-php/zipball/7d2615f9ea6a1bab2ac7ae91bb55f74680b03bae",
+                "reference": "7d2615f9ea6a1bab2ac7ae91bb55f74680b03bae",
                 "shasum": ""
             },
             "require": {
@@ -1365,7 +1365,7 @@
                 "psr/log": "^1.0",
                 "psr/simple-cache": "^1.0",
                 "ralouphie/getallheaders": "^2.0.5|^3.0",
-                "ramsey/uuid": "^3.0",
+                "ramsey/uuid": "^3.0|^4.0",
                 "webmozart/assert": "^1.0"
             },
             "require-dev": {
@@ -1398,7 +1398,7 @@
                 "monitoring",
                 "performance"
             ],
-            "time": "2020-04-01T14:42:48+00:00"
+            "time": "2020-05-28T09:30:03+00:00"
         },
         {
             "name": "swiftmailer/swiftmailer",
