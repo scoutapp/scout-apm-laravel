@@ -17,9 +17,9 @@
         "illuminate/routing": "^5.5.0|^6.0|^7.0",
         "illuminate/support": "^5.5.0|^6.0|^7.0",
         "illuminate/view": "^5.5.0|^6.0|^7.0",
-        "ramsey/uuid": "^3.0|^4.0",
         "psr/log": "^1.0",
-        "scoutapp/scout-apm-php": "^4.2"
+        "ramsey/uuid": "^3.0|^4.0",
+        "scoutapp/scout-apm-php": "^4.4"
     },
     "require-dev": {
         "doctrine/coding-standard": "^6.0",
