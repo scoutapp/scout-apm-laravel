@@ -12,8 +12,11 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        dependencies: ["lowest", "highest"]
         extensions: ["scoutapm", ""]
+        laravel-version:
+          - "5.5.*"
+          - "6.*"
+          - "7.*"
         php-version:
           - "7.1"
           - "7.2"
@@ -28,13 +31,14 @@ jobs:
           php-version: "${{ matrix.php-version }}"
           tools: pecl
           extensions: ${{ matrix.extensions }}
-      - name: "Install lowest dependencies"
-        if: ${{ matrix.dependencies == 'lowest' }}
-        run: "composer update --prefer-lowest --prefer-dist --no-interaction --no-progress --no-suggest"
-      - name: "Install highest dependencies"
-        if: ${{ matrix.dependencies == 'highest' }}
+      - name: "Install latest dependencies this platform can run with"
         run: "composer update --prefer-dist --no-interaction --no-progress --no-suggest"
-      - name: "Run PHPUnit test sutie"
+      - name: "Downgrade to lowest versions" # Otherwise composer can't seem to work out dependencies
+        if: ${{ matrix.laravel-version == '5.5.*' }}
+        run: "composer update --prefer-lowest --prefer-dist --no-interaction --no-progress --no-suggest"
+      - name: "Install specific Laravel version ${{ matrix.laravel-version}}"
+        run: "composer require laravel/framework:${{ matrix.laravel-version}} --no-interaction --no-progress --no-suggest --prefer-dist --prefer-stable"
+      - name: "Run PHPUnit test suite"
         run: "vendor/bin/phpunit"
 
   cs:
