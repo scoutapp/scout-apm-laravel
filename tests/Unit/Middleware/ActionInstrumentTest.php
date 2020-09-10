@@ -15,6 +15,7 @@ use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
 use Scoutapm\Events\Span\Span;
+use Scoutapm\Events\Span\SpanReference;
 use Scoutapm\Laravel\Middleware\ActionInstrument;
 use Scoutapm\Logger\FilteredLogLevelDecorator;
 use Scoutapm\ScoutApmAgent;
@@ -53,14 +54,6 @@ final class ActionInstrumentTest extends TestCase
             new FilteredLogLevelDecorator($this->logger, LogLevel::DEBUG),
             $this->router
         );
-
-        $this->agent
-            ->expects(self::once())
-            ->method('webTransaction')
-            ->with('unknown', self::isType(IsType::TYPE_CALLABLE))
-            ->willReturnCallback(function (string $originalName, callable $transaction) {
-                return $transaction($this->span);
-            });
     }
 
     /** @throws Throwable */
@@ -81,6 +74,43 @@ final class ActionInstrumentTest extends TestCase
         $this->logger->expects(self::once())
             ->method('log')
             ->with(LogLevel::DEBUG, '[Scout] Handle ActionInstrument');
+
+        $this->agent
+            ->expects(self::once())
+            ->method('webTransaction')
+            ->with('unknown', self::isType(IsType::TYPE_CALLABLE))
+            ->willReturnCallback(function (string $originalName, callable $transaction) {
+                return $transaction(SpanReference::fromSpan($this->span));
+            });
+
+        self::assertSame(
+            $expectedResponse,
+            $this->middleware->handle(
+                new Request(),
+                static function () use ($expectedResponse) {
+                    return $expectedResponse;
+                }
+            )
+        );
+    }
+
+    /** @throws Throwable */
+    public function testHandleRecordsDoesNotUpdateNameWhenSpanIsNull() : void
+    {
+        $expectedResponse = new Response();
+
+        $controllerName = uniqid('controllerName', true);
+
+        $this->span->expects(self::never())
+            ->method('updateName');
+
+        $this->agent
+            ->expects(self::once())
+            ->method('webTransaction')
+            ->with('unknown', self::isType(IsType::TYPE_CALLABLE))
+            ->willReturnCallback(static function (string $originalName, callable $transaction) {
+                return $transaction(null);
+            });
 
         self::assertSame(
             $expectedResponse,
@@ -112,6 +142,14 @@ final class ActionInstrumentTest extends TestCase
             ->method('log')
             ->with(LogLevel::DEBUG, '[Scout] Handle ActionInstrument');
 
+        $this->agent
+            ->expects(self::once())
+            ->method('webTransaction')
+            ->with('unknown', self::isType(IsType::TYPE_CALLABLE))
+            ->willReturnCallback(function (string $originalName, callable $transaction) {
+                return $transaction(SpanReference::fromSpan($this->span));
+            });
+
         self::assertSame(
             $expectedResponse,
             $this->middleware->handle(
@@ -139,6 +177,14 @@ final class ActionInstrumentTest extends TestCase
         $this->logger->expects(self::once())
             ->method('log')
             ->with(LogLevel::DEBUG, '[Scout] Handle ActionInstrument');
+
+        $this->agent
+            ->expects(self::once())
+            ->method('webTransaction')
+            ->with('unknown', self::isType(IsType::TYPE_CALLABLE))
+            ->willReturnCallback(function (string $originalName, callable $transaction) {
+                return $transaction(SpanReference::fromSpan($this->span));
+            });
 
         self::assertSame(
             $expectedResponse,
@@ -174,6 +220,14 @@ final class ActionInstrumentTest extends TestCase
                 )
             );
 
+        $this->agent
+            ->expects(self::once())
+            ->method('webTransaction')
+            ->with('unknown', self::isType(IsType::TYPE_CALLABLE))
+            ->willReturnCallback(function (string $originalName, callable $transaction) {
+                return $transaction(SpanReference::fromSpan($this->span));
+            });
+
         self::assertSame(
             $expectedResponse,
             $this->middleware->handle(
@@ -191,6 +245,14 @@ final class ActionInstrumentTest extends TestCase
         $this->agent->expects(self::once())
             ->method('tagRequest')
             ->with('error', 'true');
+
+        $this->agent
+            ->expects(self::once())
+            ->method('webTransaction')
+            ->with('unknown', self::isType(IsType::TYPE_CALLABLE))
+            ->willReturnCallback(function (string $originalName, callable $transaction) {
+                return $transaction(SpanReference::fromSpan($this->span));
+            });
 
         $this->expectException(Throwable::class);
         $this->expectExceptionMessage('Any old exception');

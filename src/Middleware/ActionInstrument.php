@@ -8,7 +8,7 @@ use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Route;
 use Illuminate\Routing\Router;
-use Scoutapm\Events\Span\Span;
+use Scoutapm\Events\Span\SpanReference;
 use Scoutapm\Logger\FilteredLogLevelDecorator;
 use Scoutapm\ScoutApmAgent;
 use Throwable;
@@ -43,7 +43,7 @@ final class ActionInstrument
         return $this->agent->webTransaction(
             'unknown',
             /** @return mixed */
-            function (Span $span) use ($request, $next) {
+            function (?SpanReference $span) use ($request, $next) {
                 try {
                     $response = $next($request);
                 } catch (Throwable $e) {
@@ -51,7 +51,9 @@ final class ActionInstrument
                     throw $e;
                 }
 
-                $span->updateName($this->automaticallyDetermineControllerName());
+                if ($span !== null) {
+                    $span->updateName($this->automaticallyDetermineControllerName());
+                }
 
                 return $response;
             }

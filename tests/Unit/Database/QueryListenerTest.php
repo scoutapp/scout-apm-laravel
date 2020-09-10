@@ -10,6 +10,7 @@ use PHPUnit\Framework\Constraint\IsType;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Scoutapm\Events\Span\Span;
+use Scoutapm\Events\Span\SpanReference;
 use Scoutapm\Laravel\Database\QueryListener;
 use Scoutapm\ScoutApmAgent;
 
@@ -44,9 +45,24 @@ final class QueryListenerTest extends TestCase
         $this->agent->expects(self::once())
             ->method('startSpan')
             ->with('SQL/Query', self::isType(IsType::TYPE_FLOAT))
-            ->willReturn($spanMock);
+            ->willReturn(SpanReference::fromSpan($spanMock));
 
         $this->agent->expects(self::once())
+            ->method('stopSpan');
+
+        $this->queryListener->__invoke($query);
+    }
+
+    public function testSqlQueryIsNotLoggedWhenStartSpanReturnsNull() : void
+    {
+        $query = new QueryExecuted('SELECT 1', [], 1000, $this->createMock(Connection::class));
+
+        $this->agent->expects(self::once())
+            ->method('startSpan')
+            ->with('SQL/Query', self::isType(IsType::TYPE_FLOAT))
+            ->willReturn(null);
+
+        $this->agent->expects(self::never())
             ->method('stopSpan');
 
         $this->queryListener->__invoke($query);

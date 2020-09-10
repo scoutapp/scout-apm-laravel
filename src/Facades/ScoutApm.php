@@ -6,7 +6,7 @@ namespace Scoutapm\Laravel\Facades;
 
 use Closure;
 use Illuminate\Support\Facades\Facade;
-use Scoutapm\Events\Span\Span;
+use Scoutapm\Events\Span\SpanReference;
 use Scoutapm\ScoutApmAgent;
 
 /**
@@ -14,7 +14,7 @@ use Scoutapm\ScoutApmAgent;
  *
  * @method static void connect()
  * @method static bool enabled()
- * @method static Span startSpan(string $operation, ?float $overrideTimestamp = null)
+ * @method static SpanReference startSpan(string $operation, ?float $overrideTimestamp = null)
  * @method static void stopSpan()
  * @method static mixed instrument(string $type, string $name, Closure $block)
  * @method static mixed webTransaction(string $name, Closure $block)

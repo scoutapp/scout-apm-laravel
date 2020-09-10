@@ -23,6 +23,11 @@ final class QueryListener
         $startingTime = microtime(true) - ($query->time / 1000);
 
         $span = $this->agent->startSpan('SQL/Query', $startingTime);
+
+        if ($span === null) {
+            return;
+        }
+
         $span->tag('db.statement', $query->sql);
         $this->agent->stopSpan();
     }
