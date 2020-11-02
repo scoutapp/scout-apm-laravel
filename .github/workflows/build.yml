@@ -46,7 +46,7 @@ jobs:
       - name: "Add scout-apm-laravel as a repository"
         run: cd test-app && composer config repositories.scout path ../scout-apm-laravel
       - name: "Require scout-apm-laravel current checkout"
-        run: cd test-app && composer require scoutapp/scout-apm-laravel:*@dev
+        run: cd test-app && composer require scoutapp/scout-apm-laravel:*@dev composer/package-versions-deprecated
       - name: "Publish the provider"
         run: cd test-app && php artisan vendor:publish --provider="Scoutapm\Laravel\Providers\ScoutApmServiceProvider"
       - name: "Configure Scout"

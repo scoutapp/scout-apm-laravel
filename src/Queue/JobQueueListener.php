@@ -6,7 +6,7 @@ namespace Scoutapm\Laravel\Queue;
 
 use Exception;
 use Illuminate\Queue\Events\JobProcessing;
-use Scoutapm\Events\Span\Span;
+use Scoutapm\Events\Span\SpanReference;
 use Scoutapm\ScoutApmAgent;
 use function class_basename;
 use function sprintf;
@@ -32,7 +32,7 @@ final class JobQueueListener
         /** @noinspection UnusedFunctionResultInspection */
         $this->agent->startSpan(sprintf(
             '%s/%s',
-            Span::INSTRUMENT_JOB,
+            SpanReference::INSTRUMENT_JOB,
             class_basename($jobProcessingEvent->job->resolveName())
         ));
     }
