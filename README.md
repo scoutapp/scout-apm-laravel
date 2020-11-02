@@ -35,7 +35,26 @@ SCOUT_MONITOR=true
 ```
     
 Your key can be found in the [Scout organization settings page](https://scoutapm.com/settings).
-    
+
+#### Logging Verbosity
+
+Once you have set up Scout and are happy everything is working, you can reduce the verbosity of the library's logging
+system. The library is intentionally *very* noisy by default, which gives us more information to support our customers
+if something is broken. However, if everything is working as expected, these logs can be reduced by setting the
+`log_level` configuration key to a higher `Psr\Log\LogLevel`. For example, if you are using `.env` configuration:
+
+```
+SCOUT_LOG_LEVEL=error
+```
+
+Or if you are using `config/scout_apm.php`:
+
+```php
+$config[\Scoutapm\Config\ConfigKey::LOG_LEVEL] = \Psr\Log\LogLevel::ERROR;
+```
+
+Any of the constants defined in `\Psr\Log\LogLevel` are acceptable values for this configuration option.
+
 ## Documentation
 
 For full installation and troubleshooting documentation, visit our [help site](https://docs.scoutapm.com/#laravel).
