@@ -2,6 +2,32 @@
 
 All notable changes to this project will be documented in this file, in reverse chronological order by release.
 
+## 1.7.0 - 2020-11-10
+
+### Added
+
+- [#68](https://github.com/scoutapp/scout-apm-laravel/pull/68) Documentation on Composer v2 + PHP 7.1-7.3 support
+- [#67](https://github.com/scoutapp/scout-apm-laravel/pull/67) Documentation for log level in `README.md` 
+
+### Changed
+
+- Nothing.
+
+### Deprecated
+
+- [#68](https://github.com/scoutapp/scout-apm-laravel/pull/68) Require `scoutapp/scout-apm-php:^5.1`.
+  - Note, if you use any of the `Span::INSTRUMENT_*` constants, these are deprecated, you should now use the
+    new `SpanReference::INSTRUMENT_*` constants. We plan to remove the `Span::INSTRUMENT_*` constants with the release
+    of `scout-apm-php:6.0.0`.
+
+### Removed
+
+- Nothing.
+
+### Fixed
+
+- Nothing.
+
 ## 1.6.0 - 2020-09-11
 
 ### Added
