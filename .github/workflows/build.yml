@@ -94,13 +94,12 @@ jobs:
           php-version: "${{ matrix.php-version }}"
           tools: pecl
           extensions: ${{ matrix.extensions }}
-      - name: "Install latest dependencies this platform can run with"
-        run: "composer update --prefer-dist --no-interaction --no-progress --no-suggest"
-      - name: "Downgrade to lowest versions" # Otherwise composer can't seem to work out dependencies
-        if: ${{ matrix.laravel-version == '5.5.*' }}
-        run: "composer update --prefer-lowest --prefer-dist --no-interaction --no-progress --no-suggest"
-      - name: "Install specific Laravel version ${{ matrix.laravel-version}}"
-        run: "composer require laravel/framework:${{ matrix.laravel-version}} --update-with-all-dependencies --no-interaction --no-progress --no-suggest --prefer-dist --prefer-stable"
+      # --no-update then a full `composer update` is needed to overcome locked dependencies
+      # See: https://github.com/composer/composer/issues/9561
+      - name: "Require specific Laravel version ${{ matrix.laravel-version}}"
+        run: "composer require laravel/framework:${{ matrix.laravel-version}} --no-update --no-interaction --prefer-dist --prefer-stable"
+      - name: "Composer update with new requirements"
+        run: "composer update --no-interaction --prefer-dist --prefer-stable"
       - name: "Run PHPUnit test suite"
         run: "vendor/bin/phpunit"
 
