@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "21789001774d9f692d7ededbaa6f765f",
+    "content-hash": "027d8def5b3999b9fdbe3273612e2956",
     "packages": [
         {
             "name": "brick/math",
@@ -1651,16 +1651,16 @@
         },
         {
             "name": "scoutapp/scout-apm-php",
-            "version": "v5.1.0",
+            "version": "v5.2.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/scoutapp/scout-apm-php.git",
-                "reference": "285e3207e50f06f8125937210fc406510ab74135"
+                "reference": "25501152f71ab9e2f9fb0b3c4eed7d4ad3056295"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/scoutapp/scout-apm-php/zipball/285e3207e50f06f8125937210fc406510ab74135",
-                "reference": "285e3207e50f06f8125937210fc406510ab74135",
+                "url": "https://api.github.com/repos/scoutapp/scout-apm-php/zipball/25501152f71ab9e2f9fb0b3c4eed7d4ad3056295",
+                "reference": "25501152f71ab9e2f9fb0b3c4eed7d4ad3056295",
                 "shasum": ""
             },
             "require": {
@@ -1680,9 +1680,10 @@
                 "doctrine/coding-standard": "^6.0",
                 "monolog/monolog": "^1.25",
                 "phpunit/phpunit": "^7.5.20",
+                "psalm/plugin-phpunit": "^0.15.0",
                 "psr/log": "^1.1",
                 "roave/doctrine-simplecache": "^2.2",
-                "vimeo/psalm": "^3.12.2"
+                "vimeo/psalm": "^4.3.1"
             },
             "suggest": {
                 "ext-scoutapm": "Recommended for additional recording capability of IO-bound PHP internal functions"
@@ -1707,9 +1708,9 @@
             ],
             "support": {
                 "issues": "https://github.com/scoutapp/scout-apm-php/issues",
-                "source": "https://github.com/scoutapp/scout-apm-php/tree/v5.1.0"
+                "source": "https://github.com/scoutapp/scout-apm-php/tree/v5.2.0"
             },
-            "time": "2020-11-02T10:09:26+00:00"
+            "time": "2020-12-15T11:14:36+00:00"
         },
         {
             "name": "swiftmailer/swiftmailer",
