@@ -37,6 +37,7 @@ use Scoutapm\Config;
 use Scoutapm\Connector\Connector;
 use Scoutapm\Events\Metadata;
 use Scoutapm\Extension\PotentiallyAvailableExtensionCapabilities;
+use Scoutapm\Extension\Version;
 use Scoutapm\Laravel\Middleware\ActionInstrument;
 use Scoutapm\Laravel\Middleware\IgnoredEndpoints;
 use Scoutapm\Laravel\Middleware\MiddlewareInstrument;
@@ -130,6 +131,13 @@ final class ScoutApmServiceProviderTest extends TestCase
      */
     public function testScoutAgentUsesDevNullCacheWhenNoCacheIsConfigured() : void
     {
+        $laravelVersion = Version::fromString(Application::VERSION);
+        if (! $laravelVersion->isOlderThan(Version::fromString('8.0.0'))) {
+            self::markTestSkipped('Laravel 8 always seems to configure a cache now');
+
+            return;
+        }
+
         $this->serviceProvider->register();
         $agent = $this->application->make(ScoutApmAgent::class);
 
