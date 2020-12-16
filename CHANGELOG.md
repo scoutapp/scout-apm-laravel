@@ -2,6 +2,28 @@
 
 All notable changes to this project will be documented in this file, in reverse chronological order by release.
 
+## 1.8.0 - 2020-12-15
+
+### Added
+
+- Nothing.
+
+### Changed
+
+- [#69](https://github.com/scoutapp/scout-apm-laravel/pull/69) Updated to `scout-apm-php` ^5.3.0
+
+### Deprecated
+
+- Nothing.
+
+### Removed
+
+- Nothing.
+
+### Fixed
+
+- Nothing.
+
 ## 1.7.0 - 2020-11-10
 
 ### Added
