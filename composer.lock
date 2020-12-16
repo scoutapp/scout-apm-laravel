@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "027d8def5b3999b9fdbe3273612e2956",
+    "content-hash": "2aec194e9d555987bf2c94ca86875e49",
     "packages": [
         {
             "name": "brick/math",
@@ -61,79 +61,6 @@
                 }
             ],
             "time": "2020-08-18T23:57:15+00:00"
-        },
-        {
-            "name": "composer/package-versions-deprecated",
-            "version": "1.11.99",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/composer/package-versions-deprecated.git",
-                "reference": "c8c9aa8a14cc3d3bec86d0a8c3fa52ea79936855"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/composer/package-versions-deprecated/zipball/c8c9aa8a14cc3d3bec86d0a8c3fa52ea79936855",
-                "reference": "c8c9aa8a14cc3d3bec86d0a8c3fa52ea79936855",
-                "shasum": ""
-            },
-            "require": {
-                "composer-plugin-api": "^1.1.0 || ^2.0",
-                "php": "^7 || ^8"
-            },
-            "replace": {
-                "ocramius/package-versions": "1.11.99"
-            },
-            "require-dev": {
-                "composer/composer": "^1.9.3 || ^2.0@dev",
-                "ext-zip": "^1.13",
-                "phpunit/phpunit": "^6.5 || ^7"
-            },
-            "type": "composer-plugin",
-            "extra": {
-                "class": "PackageVersions\\Installer",
-                "branch-alias": {
-                    "dev-master": "1.x-dev"
-                }
-            },
-            "autoload": {
-                "psr-4": {
-                    "PackageVersions\\": "src/PackageVersions"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Marco Pivetta",
-                    "email": "ocramius@gmail.com"
-                },
-                {
-                    "name": "Jordi Boggiano",
-                    "email": "j.boggiano@seld.be"
-                }
-            ],
-            "description": "Composer plugin that provides efficient querying for installed package versions (no runtime IO)",
-            "support": {
-                "issues": "https://github.com/composer/package-versions-deprecated/issues",
-                "source": "https://github.com/composer/package-versions-deprecated/tree/master"
-            },
-            "funding": [
-                {
-                    "url": "https://packagist.com",
-                    "type": "custom"
-                },
-                {
-                    "url": "https://github.com/composer",
-                    "type": "github"
-                },
-                {
-                    "url": "https://tidelift.com/funding/github/packagist/composer/composer",
-                    "type": "tidelift"
-                }
-            ],
-            "time": "2020-08-25T05:50:16+00:00"
         },
         {
             "name": "doctrine/inflector",
@@ -1651,16 +1578,16 @@
         },
         {
             "name": "scoutapp/scout-apm-php",
-            "version": "v5.2.0",
+            "version": "v5.3.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/scoutapp/scout-apm-php.git",
-                "reference": "25501152f71ab9e2f9fb0b3c4eed7d4ad3056295"
+                "reference": "f8594bd3b18e8770e20ad29c7fb0a2c1553f17d8"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/scoutapp/scout-apm-php/zipball/25501152f71ab9e2f9fb0b3c4eed7d4ad3056295",
-                "reference": "25501152f71ab9e2f9fb0b3c4eed7d4ad3056295",
+                "url": "https://api.github.com/repos/scoutapp/scout-apm-php/zipball/f8594bd3b18e8770e20ad29c7fb0a2c1553f17d8",
+                "reference": "f8594bd3b18e8770e20ad29c7fb0a2c1553f17d8",
                 "shasum": ""
             },
             "require": {
@@ -1668,7 +1595,6 @@
                 "ext-openssl": "*",
                 "ext-sockets": "*",
                 "ext-zlib": "*",
-                "ocramius/package-versions": "^1.4",
                 "php": ">=7.1.0,<7.5.0",
                 "psr/log": "^1.0",
                 "psr/simple-cache": "^1.0",
@@ -1677,6 +1603,7 @@
                 "webmozart/assert": "^1.0"
             },
             "require-dev": {
+                "composer-plugin-api": "^2.0",
                 "doctrine/coding-standard": "^6.0",
                 "monolog/monolog": "^1.25",
                 "phpunit/phpunit": "^7.5.20",
@@ -1686,6 +1613,7 @@
                 "vimeo/psalm": "^4.3.1"
             },
             "suggest": {
+                "composer-runtime-api": "Composer v2 is required for seeing version information in metadata",
                 "ext-scoutapm": "Recommended for additional recording capability of IO-bound PHP internal functions"
             },
             "type": "library",
@@ -1708,9 +1636,9 @@
             ],
             "support": {
                 "issues": "https://github.com/scoutapp/scout-apm-php/issues",
-                "source": "https://github.com/scoutapp/scout-apm-php/tree/v5.2.0"
+                "source": "https://github.com/scoutapp/scout-apm-php/tree/v5.3.0"
             },
-            "time": "2020-12-15T11:14:36+00:00"
+            "time": "2020-12-16T09:15:18+00:00"
         },
         {
             "name": "swiftmailer/swiftmailer",
@@ -4536,6 +4464,79 @@
                 "source": "https://github.com/clue/php-utf8-react/tree/v1.1.0"
             },
             "time": "2017-07-06T07:43:22+00:00"
+        },
+        {
+            "name": "composer/package-versions-deprecated",
+            "version": "1.11.99",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/composer/package-versions-deprecated.git",
+                "reference": "c8c9aa8a14cc3d3bec86d0a8c3fa52ea79936855"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/composer/package-versions-deprecated/zipball/c8c9aa8a14cc3d3bec86d0a8c3fa52ea79936855",
+                "reference": "c8c9aa8a14cc3d3bec86d0a8c3fa52ea79936855",
+                "shasum": ""
+            },
+            "require": {
+                "composer-plugin-api": "^1.1.0 || ^2.0",
+                "php": "^7 || ^8"
+            },
+            "replace": {
+                "ocramius/package-versions": "1.11.99"
+            },
+            "require-dev": {
+                "composer/composer": "^1.9.3 || ^2.0@dev",
+                "ext-zip": "^1.13",
+                "phpunit/phpunit": "^6.5 || ^7"
+            },
+            "type": "composer-plugin",
+            "extra": {
+                "class": "PackageVersions\\Installer",
+                "branch-alias": {
+                    "dev-master": "1.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "PackageVersions\\": "src/PackageVersions"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Marco Pivetta",
+                    "email": "ocramius@gmail.com"
+                },
+                {
+                    "name": "Jordi Boggiano",
+                    "email": "j.boggiano@seld.be"
+                }
+            ],
+            "description": "Composer plugin that provides efficient querying for installed package versions (no runtime IO)",
+            "support": {
+                "issues": "https://github.com/composer/package-versions-deprecated/issues",
+                "source": "https://github.com/composer/package-versions-deprecated/tree/master"
+            },
+            "funding": [
+                {
+                    "url": "https://packagist.com",
+                    "type": "custom"
+                },
+                {
+                    "url": "https://github.com/composer",
+                    "type": "github"
+                },
+                {
+                    "url": "https://tidelift.com/funding/github/packagist/composer/composer",
+                    "type": "tidelift"
+                }
+            ],
+            "time": "2020-08-25T05:50:16+00:00"
         },
         {
             "name": "composer/semver",

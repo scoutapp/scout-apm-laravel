@@ -10,7 +10,7 @@ All notable changes to this project will be documented in this file, in reverse 
 
 ### Changed
 
-- [#69](https://github.com/scoutapp/scout-apm-laravel/pull/69) Updated to `scout-apm-php` ^5.2.0
+- [#69](https://github.com/scoutapp/scout-apm-laravel/pull/69) Updated to `scout-apm-php` ^5.3.0
 
 ### Deprecated
 
