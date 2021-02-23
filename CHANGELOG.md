@@ -2,6 +2,30 @@
 
 All notable changes to this project will be documented in this file, in reverse chronological order by release.
 
+## 2.0.0 - 2021-02-23
+
+### Added
+
+- Nothing.
+
+### Changed
+
+- [#74](https://github.com/scoutapp/scout-apm-laravel/pull/74) Updated to `scout-apm-php` ^6.0
+  - `scout-apm-laravel` is now a meta package only, which defines which versions of Laravel we support. You should
+    still use this package directly if you use Laravel to ensure you are running a compatible Laravel version.
+
+### Deprecated
+
+- Nothing.
+
+### Removed
+
+- Nothing.
+
+### Fixed
+
+- Nothing.
+
 ## 1.8.0 - 2020-12-16
 
 ### Added
