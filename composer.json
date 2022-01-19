@@ -17,7 +17,7 @@
         "illuminate/routing": "^5.5.0|^6.0|^7.0|^8.0",
         "illuminate/support": "^5.5.0|^6.0|^7.0|^8.0",
         "illuminate/view": "^5.5.0|^6.0|^7.0|^8.0",
-        "scoutapp/scout-apm-php": "^6.0"
+        "scoutapp/scout-apm-php": "^7.0"
     },
     "config": {
         "preferred-install": "dist",
