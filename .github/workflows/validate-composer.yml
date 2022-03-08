@@ -18,6 +18,7 @@ jobs:
           - "6.*"
           - "7.*"
           - "8.*"
+          - "9.*"
         php-version:
           - "7.1"
           - "7.2"
@@ -40,6 +41,11 @@ jobs:
           # Laravel 8 supports PHP 7.3 - 8.1
           - {laravel-version: "8.*", php-version: "7.1"} # Laravel 8 requires 7.3+
           - {laravel-version: "8.*", php-version: "7.2"} # Laravel 8 requires 7.3+
+          # Laravel 9 supports PHP 7.3 - 8.1
+          - {laravel-version: "9.*", php-version: "7.1"} # Laravel 9 requires 8.0+
+          - {laravel-version: "9.*", php-version: "7.2"} # Laravel 9 requires 8.0+
+          - {laravel-version: "9.*", php-version: "7.3"} # Laravel 9 requires 8.0+
+          - {laravel-version: "9.*", php-version: "7.4"} # Laravel 9 requires 8.0+
     steps:
       - uses: actions/checkout@v2
       - name: "Install PHP"
