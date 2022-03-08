@@ -2,6 +2,28 @@
 
 All notable changes to this project will be documented in this file, in reverse chronological order by release.
 
+## 2.2.0 - 2022-03-08
+
+### Added
+
+- Nothing.
+
+### Changed
+
+- [#84](https://github.com/scoutapp/scout-apm-laravel/pull/84) Updated to require `scout-apm-php` ^8.0 (Laravel 9 support)
+
+### Deprecated
+
+- Nothing.
+
+### Removed
+
+- Nothing.
+
+### Fixed
+
+- Nothing.
+
 ## 2.1.0 - 2022-01-19
 
 ### Added
