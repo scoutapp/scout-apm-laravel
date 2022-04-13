@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file, in reverse chronological order by release.
 
+# THE CHANGELOG HAS MOVED
+
+Please see [the releases page](https://github.com/scoutapp/scout-apm-laravel/releases) for release 2.3.0 onwards.
+
 ## 2.2.0 - 2022-03-08
 
 ### Added
