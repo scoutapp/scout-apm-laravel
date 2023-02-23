@@ -49,7 +49,7 @@ jobs:
           - {laravel-version: "10.*", php-version: "7.4"} # Laravel 10 requires 8.1+
           - {laravel-version: "10.*", php-version: "8.0"} # Laravel 10 requires 8.1+
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: "Install PHP"
         uses: shivammathur/setup-php@v2
         with:
