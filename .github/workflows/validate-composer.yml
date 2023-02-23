@@ -24,6 +24,7 @@ jobs:
           - "7.4"
           - "8.0"
           - "8.1"
+          - "8.2"
         exclude:
           # See - https://laravel.com/docs/9.x/releases#support-policy
           # See - https://github.com/laravel/framework/issues/40339
