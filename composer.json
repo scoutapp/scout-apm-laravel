@@ -24,7 +24,8 @@
         "optimize-autoloader": true,
         "sort-packages": true,
         "allow-plugins": {
-            "php-http/discovery": true
+            "php-http/discovery": true,
+            "kylekatarnls/update-helper": true
         }
     }
 }

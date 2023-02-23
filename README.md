@@ -5,7 +5,7 @@ Detailed performance metrics and transaction traces are collected once the scout
 
 ## Requirements
 
-* PHP Version: PHP 7.2+ (PHP 8.1+ recommended)
+* PHP Version: PHP 7.2+ (PHP 8.2+ recommended)
 * Laravel Version: 5.5+
 
 ## Quick Start
@@ -20,23 +20,6 @@ Then use Laravel's `artisan vendor:publish` to ensure configuration can be cache
 
 ```bash
 php artisan vendor:publish --provider="Scoutapm\Laravel\Providers\ScoutApmServiceProvider"
-```
-
-#### Composer 2 and PHP 7.1-7.3 support
-
-If you are using PHP 7.1, 7.2, or 7.3, *and* you have started using Composer v2, please read this.
-`scoutapp/scout-apm-php` depends on a package called `ocramius/package-versions`. However, this package only provides
-support for the new Composer 2 series in version 1.8 or above, which requires PHP 7.4 as a minimum. If you are using
-PHP 7.1-7.3, and you would like to use Composer 2, you have the following options:
-
- - Upgrade to PHP 7.4 (this is the recommended approach!)
- - Don't use Composer 2 (stick to Composer 1)
- - Require the polyfill `composer/package-versions-deprecated` (provides support for Composer 2 in PHP 7.1-7.3)
-
-If you opt to use the polyfill, you would install both packages, for example:
-
-```bash
-composer require scoutapp/scout-apm-laravel composer/package-versions-deprecated
 ```
 
 ### Configuration
