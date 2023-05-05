@@ -27,7 +27,7 @@ php artisan vendor:publish --provider="Scoutapm\Laravel\Providers\ScoutApmServic
 In your `.env` file, make sure you set a few configuration variables:
 
 ```
-SCOUT_KEY=ABC0ZABCDEFGHIJKLMNOP
+SCOUT_KEY=ABC0ZABCDEFGHIJKLMNOP1
 SCOUT_NAME="My Laravel App"
 SCOUT_MONITOR=true
 ```
